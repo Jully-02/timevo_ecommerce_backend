@@ -8,6 +8,7 @@ import com.timevo_ecommerce_backend.exceptions.ExistDataException;
 import com.timevo_ecommerce_backend.exceptions.InvalidParamException;
 import com.timevo_ecommerce_backend.repositories.*;
 import com.timevo_ecommerce_backend.responses.CloudinaryResponse;
+import com.timevo_ecommerce_backend.responses.ProductImageResponse;
 import com.timevo_ecommerce_backend.responses.ProductResponse;
 import com.timevo_ecommerce_backend.responses.ProductVariantResponse;
 import com.timevo_ecommerce_backend.services.file_upload.IFileUploadService;
@@ -66,7 +67,21 @@ public class ProductService implements IProductService {
             newProduct.setCollections(collections);
         }
         newProduct = productRepository.save(newProduct);
-        return modelMapper.map(newProduct, ProductResponse.class);
+        ProductResponse productResponse = modelMapper.map(newProduct, ProductResponse.class);
+        productResponse.setProductImages(
+                newProduct.getProductImages().stream()
+                        .map(productImage -> {
+                             return ProductImageResponse.builder()
+                                    .id(productImage.getId())
+                                    .productId(productImage.getProduct().getId())
+                                    .colorId(productImage.getColor().getId())
+                                    .isMainImage(productImage.isMainImage())
+                                    .imageName(productImage.getImageName())
+                                    .imageUrl(productImage.getImageUrl())
+                                    .build();
+                        }).toList()
+        );
+        return productResponse;
     }
 
     @Override
@@ -83,6 +98,19 @@ public class ProductService implements IProductService {
                     variant -> variantResponses.add(modelMapper.map(variant, ProductVariantResponse.class))
             );
             productResponse.setVariants(variantResponses);
+            productResponse.setProductImages(
+                    product.getProductImages().stream()
+                            .map(productImage -> {
+                                return ProductImageResponse.builder()
+                                        .id(productImage.getId())
+                                        .productId(productImage.getProduct().getId())
+                                        .colorId(productImage.getColor().getId())
+                                        .isMainImage(productImage.isMainImage())
+                                        .imageName(productImage.getImageName())
+                                        .imageUrl(productImage.getImageUrl())
+                                        .build();
+                            }).toList()
+            );
             return productResponse;
         }
     }
@@ -100,6 +128,19 @@ public class ProductService implements IProductService {
                             variant -> variantResponses.add(modelMapper.map(variant, ProductVariantResponse.class))
                     );
                     productResponse.setVariants(variantResponses);
+                    productResponse.setProductImages(
+                            product.getProductImages().stream()
+                                    .map(productImage -> {
+                                        return ProductImageResponse.builder()
+                                                .id(productImage.getId())
+                                                .productId(productImage.getProduct().getId())
+                                                .colorId(productImage.getColor().getId())
+                                                .isMainImage(productImage.isMainImage())
+                                                .imageName(productImage.getImageName())
+                                                .imageUrl(productImage.getImageUrl())
+                                                .build();
+                                    }).toList()
+                    );
                     return productResponse;
                 }
         );
@@ -138,7 +179,21 @@ public class ProductService implements IProductService {
             }
             productRepository.save(existingProduct);
 
-            return modelMapper.map(existingProduct, ProductResponse.class);
+            ProductResponse productResponse = modelMapper.map(existingProduct, ProductResponse.class);
+            productResponse.setProductImages(
+                    existingProduct.getProductImages().stream()
+                            .map(productImage -> {
+                                return ProductImageResponse.builder()
+                                        .id(productImage.getId())
+                                        .productId(productImage.getProduct().getId())
+                                        .colorId(productImage.getColor().getId())
+                                        .isMainImage(productImage.isMainImage())
+                                        .imageName(productImage.getImageName())
+                                        .imageUrl(productImage.getImageUrl())
+                                        .build();
+                            }).toList()
+            );
+            return productResponse;
         }
         return null;
     }
@@ -157,7 +212,7 @@ public class ProductService implements IProductService {
 
     @Override
     @Transactional
-    public ProductImage insertProductImage(Long productId, Long colorId, ProductImageDTO productImageDTO) throws Exception {
+    public ProductImageResponse insertProductImage(Long productId, Long colorId, ProductImageDTO productImageDTO) throws Exception {
         Product existingProduct = productRepository.findById(productImageDTO.getProductId())
                 .orElseThrow(() -> new DataNotFoundException("Cannot find Product with ID = " + productImageDTO.getProductId()));
 
@@ -165,9 +220,10 @@ public class ProductService implements IProductService {
                 .orElseThrow(() -> new DataNotFoundException("Cannot find Color with ID = " + colorId));
 
         List<ProductVariant> existingVariant = productVariantRepository.findByProductIdAndColorId(productId, colorId);
-        if (existingVariant == null) {
+        if (existingVariant.isEmpty()) {
             throw new Exception("Product and Color not exist");
         }
+//        ProductVariant productVariant = pro
         ProductImage newProductImage = ProductImage.builder()
                 .product(existingProduct)
                 .imageName(productImageDTO.getImageName())
@@ -188,7 +244,15 @@ public class ProductService implements IProductService {
             existingProduct.setThumbnail(productImageDTO.getImageUrl());
         }
         productRepository.save(existingProduct);
-        return productImageRepository.save(newProductImage);
+        newProductImage = productImageRepository.save(newProductImage);
+        return ProductImageResponse.builder()
+                .productId(existingProduct.getId())
+                .colorId(existingColor.getId())
+                .isMainImage(newProductImage.isMainImage())
+                .imageUrl(newProductImage.getImageUrl())
+                .imageName(newProductImage.getImageName())
+                .id(newProductImage.getId())
+                .build();
     }
 
     @Override
@@ -202,6 +266,19 @@ public class ProductService implements IProductService {
                             variant -> variantResponses.add(modelMapper.map(variant, ProductVariantResponse.class))
                     );
                     productResponse.setVariants(variantResponses);
+                    productResponse.setProductImages(
+                            product.getProductImages().stream()
+                                    .map(productImage -> {
+                                        return ProductImageResponse.builder()
+                                                .id(productImage.getId())
+                                                .productId(productImage.getProduct().getId())
+                                                .colorId(productImage.getColor().getId())
+                                                .isMainImage(productImage.isMainImage())
+                                                .imageName(productImage.getImageName())
+                                                .imageUrl(productImage.getImageUrl())
+                                                .build();
+                                    }).toList()
+                    );
                     return productResponse;
                 }).toList();
     }

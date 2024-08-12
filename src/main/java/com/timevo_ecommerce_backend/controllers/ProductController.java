@@ -8,6 +8,7 @@ import com.timevo_ecommerce_backend.entities.Color;
 import com.timevo_ecommerce_backend.entities.ProductImage;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.CloudinaryResponse;
+import com.timevo_ecommerce_backend.responses.ProductImageResponse;
 import com.timevo_ecommerce_backend.responses.ProductListResponse;
 import com.timevo_ecommerce_backend.responses.ProductResponse;
 import com.timevo_ecommerce_backend.services.color.IColorService;
@@ -72,7 +73,7 @@ public class ProductController {
             if (files.size() > ProductImage.MAXIMUM_IMAGES_PER_COLOR_OF_PRODUCT) {
                 return ResponseEntity.badRequest().body("You can only upload maximum " + ProductImage.MAXIMUM_IMAGES_PER_COLOR_OF_PRODUCT + " images");
             }
-            List<ProductImage> productImages = new ArrayList<>();
+            List<ProductImageResponse> productImages = new ArrayList<>();
             for (MultipartFile file : files) {
                 if (file.getSize() == 0) {
                     continue;
@@ -91,7 +92,7 @@ public class ProductController {
 //                String fileName = storeFile(file);
 //                String name = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 CloudinaryResponse cloudinaryResponse = productService.uploadImage(file);
-                ProductImage productImage = productService.insertProductImage(
+                ProductImageResponse productImage = productService.insertProductImage(
                         existingProduct.getId(),
                         existingColor.getId(),
                         ProductImageDTO.builder()

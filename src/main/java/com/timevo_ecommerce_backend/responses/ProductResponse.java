@@ -49,5 +49,5 @@ public class ProductResponse {
     private List<ProductVariantResponse> variants;
 
     @JsonProperty("product_images")
-    private List<ProductImage> productImages;
+    private List<ProductImageResponse> productImages;
 }

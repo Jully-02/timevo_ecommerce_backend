@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class FileUploadUtil {
     public static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
-    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
+    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp))$)";
 
     public static boolean isAllowedExtension (String fileName, String pattern) {
         Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(fileName);

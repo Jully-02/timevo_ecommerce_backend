@@ -1,8 +1,16 @@
 package com.timevo_ecommerce_backend.controllers;
 
 import com.timevo_ecommerce_backend.dtos.OrderDTO;
+import com.timevo_ecommerce_backend.entities.Order;
+import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
+import com.timevo_ecommerce_backend.responses.OrderListResponse;
+import com.timevo_ecommerce_backend.responses.OrderResponse;
+import com.timevo_ecommerce_backend.services.order.IOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -14,6 +22,8 @@ import java.util.List;
 @RequestMapping("${api.prefix}orders")
 @RequiredArgsConstructor
 public class OrderController {
+
+    private final IOrderService orderService;
 
     @PostMapping("")
     public ResponseEntity<?> insertOrder (
@@ -27,20 +37,35 @@ public class OrderController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            return ResponseEntity.ok("Insert Order Successfully");
+            return ResponseEntity.ok(orderService.insertOrder(orderDTO));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrder (@PathVariable("id") Long orderId) {
-        return ResponseEntity.ok("Get Order by ID");
+    public ResponseEntity<?> getOrder (@PathVariable("id") Long orderId) throws DataNotFoundException {
+        return ResponseEntity.ok(orderService.getOrder(orderId));
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getOrders () {
-        return ResponseEntity.ok("Get Orders");
+    public ResponseEntity<?> getOrders (
+            @RequestParam("page") int page,
+            @RequestParam("limit") int limit
+    ) {
+        PageRequest pageRequest = PageRequest.of(
+                page, limit,
+                Sort.by("id").ascending()
+        );
+        Page<OrderResponse> orderPages = orderService.getOrders(pageRequest);
+        int totalPages = orderPages.getTotalPages();
+        List<OrderResponse> orderResponses = orderPages.getContent();
+        return ResponseEntity.ok(
+                OrderListResponse.builder()
+                        .orderResponses(orderResponses)
+                        .totalPages(totalPages)
+                        .build()
+        );
     }
 
     @GetMapping("/user/{user_id}")
@@ -61,14 +86,15 @@ public class OrderController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            return ResponseEntity.ok("Update Order Successfully");
+            return ResponseEntity.ok(orderService.updateOrder(orderId, orderDTO));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrder (@PathVariable("id") Long orderId) {
+    public ResponseEntity<?> deleteOrder (@PathVariable("id") Long orderId) throws DataNotFoundException {
+        orderService.deleteOrder(orderId);
         return ResponseEntity.ok("Delete Successfully");
     }
 }
