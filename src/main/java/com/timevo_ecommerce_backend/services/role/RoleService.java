@@ -3,6 +3,7 @@ package com.timevo_ecommerce_backend.services.role;
 import com.timevo_ecommerce_backend.dtos.RoleDTO;
 import com.timevo_ecommerce_backend.entities.Role;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
+import com.timevo_ecommerce_backend.exceptions.ExistDataException;
 import com.timevo_ecommerce_backend.repositories.RoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,10 @@ public class RoleService implements IRoleService{
 
     @Override
     @Transactional
-    public Role insertRole(RoleDTO roleDTO) {
+    public Role insertRole(RoleDTO roleDTO) throws ExistDataException {
+        if (roleRepository.existsByName(roleDTO.getName())) {
+            throw new ExistDataException("Role's name is duplicated");
+        }
         Role role = modelMapper.map(roleDTO, Role.class);
         return roleRepository.save(role);
     }

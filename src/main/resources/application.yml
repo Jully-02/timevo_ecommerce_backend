@@ -9,14 +9,28 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: timevo.service@gmail.com
+    password: dmweoodnebrrolrm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
 api:
   prefix: api/v1/
+jwt:
+  expiration: 2592000 #30 days
+  secretKey: jtc6zcRYQr5lZj4UCIwkIbLjpP/AhDbSiZhUHa5VoGw=
