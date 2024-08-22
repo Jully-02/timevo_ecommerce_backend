@@ -15,11 +15,11 @@ public interface IOrderService {
 
     OrderResponse getOrder (Long id) throws DataNotFoundException;
 
-    Page<OrderResponse> getOrders(PageRequest pageRequest);
+    Page<OrderResponse> getOrders(String keyword, Pageable pageable);
 
     OrderResponse updateOrder (Long id, OrderDTO orderDTO) throws DataNotFoundException;
 
-    List<OrderResponse> findByUserId (Long id) throws DataNotFoundException;
+    List<OrderResponse> findByUserId (Long id);
 
     void deleteOrder (Long id) throws DataNotFoundException;
 }

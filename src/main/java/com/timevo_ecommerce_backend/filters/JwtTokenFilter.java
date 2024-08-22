@@ -1,6 +1,6 @@
 package com.timevo_ecommerce_backend.filters;
 
-import com.timevo_ecommerce_backend.components.JwtTokenUtils;
+import com.timevo_ecommerce_backend.components.JwtTokenUtil;
 import com.timevo_ecommerce_backend.entities.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,15 +19,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.data.util.Pair;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
-
     @Value("${api.prefix}")
     private String apiPrefix;
     private final UserDetailsService userDetailsService;
-    private final JwtTokenUtils jwtTokenUtils;
+    private final JwtTokenUtil jwtTokenUtil;
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
@@ -45,12 +44,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 return;
             }
             final String token = authHeader.substring(7);
-            final String email = jwtTokenUtils.extractEmail(token);
+            final String email = jwtTokenUtil.extractEmail(token);
             if (email != null
                     && SecurityContextHolder.getContext().getAuthentication() == null
             ) {
                 User userDetails = (User) userDetailsService.loadUserByUsername(email);
-                if (jwtTokenUtils.validateToken(token, userDetails)) {
+                if (jwtTokenUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -64,12 +63,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
-
     }
 
-    private boolean isBypassToken (
-            @NotNull HttpServletRequest request
-    ) {
+    private boolean isBypassToken (@NotNull HttpServletRequest request) {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
                 Pair.of(String.format("%s/products**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products/images/**", apiPrefix), "GET"),

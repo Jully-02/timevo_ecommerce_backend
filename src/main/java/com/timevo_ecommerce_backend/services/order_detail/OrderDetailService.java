@@ -23,6 +23,7 @@ public class OrderDetailService implements IOrderDetailService {
     private final ColorRepository colorRepository;
     private final MaterialRepository materialRepository;
     private final ScreenSizeRepository screenSizeRepository;
+    private final ProductVariantRepository productVariantRepository;
 
     @Override
     @Transactional
@@ -41,6 +42,14 @@ public class OrderDetailService implements IOrderDetailService {
 
         ScreenSize existingScreenSize = screenSizeRepository.findById(orderDetailDTO.getScreenSizeId())
                 .orElseThrow(() -> new DataNotFoundException("Cannot find Screen size with ID = " + orderDetailDTO.getScreenSizeId()));
+        if (!productVariantRepository.existsByProductIdAndColorIdAndMaterialIdAndScreenSizeId(
+                existingProduct.getId(),
+                existingColor.getId(),
+                existingMaterial.getId(),
+                existingScreenSize.getId()
+        )) {
+            throw new DataNotFoundException("No products found with these attributes");
+        }
 
         OrderDetail orderDetail = modelMapper.map(orderDetailDTO, OrderDetail.class);
         orderDetail.setOrder(existingOrder);
@@ -99,6 +108,15 @@ public class OrderDetailService implements IOrderDetailService {
             ScreenSize screenSize = screenSizeRepository.findById(orderDetailDTO.getScreenSizeId())
                     .orElseThrow(() -> new DataNotFoundException("Cannot find Screen size with ID = " + orderDetailDTO.getScreenSizeId()));
             existingOrderDetail.setScreenSize(screenSize);
+        }
+
+        if (!productVariantRepository.existsByProductIdAndColorIdAndMaterialIdAndScreenSizeId(
+                existingOrderDetail.getProduct().getId(),
+                existingOrderDetail.getColor().getId(),
+                existingOrderDetail.getMaterial().getId(),
+                existingOrderDetail.getScreenSize().getId()
+        )) {
+            throw new DataNotFoundException("No products found with these attributes");
         }
 //        modelMapper.map(orderDetailDTO, existingOrderDetail);
         orderDetailRepository.save(existingOrderDetail);

@@ -1,5 +1,6 @@
 package com.timevo_ecommerce_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,4 +63,12 @@ public class OrderDetail {
     })
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    @ManyToOne(cascade = {
+            CascadeType.PERSIST, CascadeType.DETACH,
+            CascadeType.MERGE, CascadeType.REFRESH
+    })
+    @JoinColumn(name = "coupon_id")
+    @JsonBackReference
+    private Coupon coupon;
 }

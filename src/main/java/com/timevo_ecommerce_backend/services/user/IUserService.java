@@ -7,6 +7,7 @@ import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,9 +20,15 @@ public interface IUserService {
 
     int activeAccount (String email, String activeCode) throws DataNotFoundException;
 
-    UserResponse getUserDetailsFromToken (String token) throws Exception;
+    User getUserDetailsFromToken (String token) throws Exception;
 
-    Page<UserResponse> getUsers (PageRequest pageRequest);
+    Page<UserResponse> getUsers (String keyword, Pageable pageable);
 
     UserResponse updateUser (Long userId, UserUpdateDTO userDTO) throws Exception;
+
+    User getUserDetailsFromRefreshToken (String refreshToken) throws  Exception;
+
+    void resetPassword (Long userId, String newPassword) throws DataNotFoundException;
+
+    void blockOrEnable (Long userId, Boolean active) throws DataNotFoundException;
 }

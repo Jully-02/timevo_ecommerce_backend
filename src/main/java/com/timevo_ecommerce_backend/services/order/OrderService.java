@@ -32,6 +32,7 @@ public class OrderService implements IOrderService{
     private final ColorRepository colorRepository;
     private final MaterialRepository materialRepository;
     private final ScreenSizeRepository screenSizeRepository;
+    private final ProductVariantRepository productVariantRepository;
 
     @Override
     @Transactional
@@ -79,6 +80,14 @@ public class OrderService implements IOrderService{
             ScreenSize existingScreenSize = screenSizeRepository.findById(cartItemDTO.getScreenSizeId())
                     .orElseThrow(() -> new DataNotFoundException("Cannot find Screen size with ID = " + cartItemDTO.getScreenSizeId()));
 
+            if (!productVariantRepository.existsByProductIdAndColorIdAndMaterialIdAndScreenSizeId(
+                    existingProduct.getId(),
+                    existingColor.getId(),
+                    existingMaterial.getId(),
+                    existingScreenSize.getId())
+            ) {
+                throw new DataNotFoundException("No products found with these attributes");
+            }
             orderDetail.setQuantity(cartItemDTO.getQuantity());
             orderDetail.setProduct(existingProduct);
             orderDetail.setColor(existingColor);
@@ -119,9 +128,9 @@ public class OrderService implements IOrderService{
     }
 
     @Override
-    public Page<OrderResponse> getOrders(PageRequest pageRequest) {
+    public Page<OrderResponse> getOrders(String keyword, Pageable pageable) {
         Page<Order> ordersPage;
-        ordersPage = orderRepository.findAll(pageRequest);
+        ordersPage = orderRepository.findAll(keyword, pageable);
         return ordersPage
                 .map(order -> {
                     OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
@@ -181,7 +190,7 @@ public class OrderService implements IOrderService{
     }
 
     @Override
-    public List<OrderResponse> findByUserId(Long id) throws DataNotFoundException {
+    public List<OrderResponse> findByUserId(Long id) {
         List<Order> orders = orderRepository.findByUserId(id);
         return orders.stream()
                 .map(order -> {

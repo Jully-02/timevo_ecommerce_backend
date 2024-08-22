@@ -22,6 +22,7 @@ public class CartItemService implements ICartItemService {
     private final MaterialRepository materialRepository;
     private final ScreenSizeRepository screenSizeRepository;
     private final ModelMapper modelMapper;
+    private final ProductVariantRepository productVariantRepository;
     @Override
     @Transactional
     public CartItem insertCartItem(CartItemDTO cartItemDTO) throws DataNotFoundException {
@@ -52,6 +53,14 @@ public class CartItemService implements ICartItemService {
 
         ScreenSize existingScreenSize = screenSizeRepository.findById(cartItemDTO.getScreenSizeId())
                 .orElseThrow(() -> new DataNotFoundException("Cannot find Screen size with ID = " + cartItemDTO.getScreenSizeId()));
+        if (!productVariantRepository.existsByProductIdAndColorIdAndMaterialIdAndScreenSizeId(
+                existingProduct.getId(),
+                existingColor.getId(),
+                existingMaterial.getId(),
+                existingScreenSize.getId()
+        )) {
+            throw new DataNotFoundException("No products found with these attributes");
+        }
 
         CartItem newCartItem = modelMapper.map(cartItemDTO, CartItem.class);
         newCartItem.setUser(existingUser);

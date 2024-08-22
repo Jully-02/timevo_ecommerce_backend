@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -28,13 +29,23 @@ public class Token extends BaseEntity{
     private String tokenType;
 
     @Column(name = "expiration_date")
-    private Date expirationDate;
+    private LocalDateTime expirationDate;
 
     @Column(name = "revoked")
     private boolean revoked;
 
     @Column(name = "expired")
     private boolean expired;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+
+    @Column(name = "refresh_expiration_date")
+    private LocalDateTime refreshExpirationDate;
+
+    @Column(name = "is_mobile")
+    private boolean isMobile;
 
     @ManyToOne(cascade = {
             CascadeType.PERSIST, CascadeType.MERGE,

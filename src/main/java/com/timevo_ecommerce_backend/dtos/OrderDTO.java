@@ -74,5 +74,6 @@ public class OrderDTO {
     private String shippingAddress;
 
     @JsonProperty("cart_items")
+    @NotNull(message = "Cart item is required")
     private List<CartItemDTO> cartItems;
 }

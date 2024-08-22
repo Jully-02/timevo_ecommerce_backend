@@ -1,21 +1,20 @@
 package com.timevo_ecommerce_backend.controllers;
 
 import com.github.javafaker.Faker;
+import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.ProductDTO;
 import com.timevo_ecommerce_backend.dtos.ProductImageDTO;
 import com.timevo_ecommerce_backend.dtos.ProductVariantDTO;
 import com.timevo_ecommerce_backend.entities.Color;
 import com.timevo_ecommerce_backend.entities.ProductImage;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.CloudinaryResponse;
-import com.timevo_ecommerce_backend.responses.ProductImageResponse;
-import com.timevo_ecommerce_backend.responses.ProductListResponse;
-import com.timevo_ecommerce_backend.responses.ProductResponse;
+import com.timevo_ecommerce_backend.responses.*;
 import com.timevo_ecommerce_backend.services.color.IColorService;
 import com.timevo_ecommerce_backend.services.file_upload.IFileUploadService;
 import com.timevo_ecommerce_backend.services.product.IProductService;
 import com.timevo_ecommerce_backend.services.variant.IProductVariantService;
 import com.timevo_ecommerce_backend.utils.FileUploadUtil;
+import com.timevo_ecommerce_backend.utils.MessagesKey;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -32,35 +32,45 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @RestController
-@RequestMapping("${api.prefix}products")
+@RequestMapping("${api.prefix}/products")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final IProductService productService;
     private final IProductVariantService productVariantService;
     private final IColorService colorService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
-    public ResponseEntity<?> insertProduct (
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> insertProduct (
             @Valid @RequestBody ProductDTO productDTO,
             BindingResult result
-    ) {
-        try {
+    ) throws Exception {
             if (result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
+                return ResponseEntity.badRequest().body(
+                        Response.builder()
+                                .message(localizationUtils.getLocalizedMessage(MessagesKey.INVALID_ERROR, errorMessages.toString()))
+                                .status(HttpStatus.BAD_REQUEST)
+                                .build()
+                );
             }
             ProductResponse productResponse = productService.insertProduct(productDTO);
-            return ResponseEntity.ok(productResponse);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .data(productResponse)
+                            .status(HttpStatus.CREATED)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.INSERT_SUCCESSFULLY))
+                            .build()
+            );
     }
 
     @PostMapping(value = "uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> uploadImages (
             @RequestParam("product-id") Long productId,
             @RequestParam("color-id") Long colorId,
@@ -111,7 +121,7 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getProducts (
+    public ResponseEntity<Response> getProducts (
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "", name = "category-ids") String categoryIds,
             @RequestParam(defaultValue = "", name = "color-ids") String colorIds,
@@ -194,43 +204,68 @@ public class ProductController {
         List<ProductResponse> productResponses = productPage.getContent();
 
         return ResponseEntity.ok(
-                ProductListResponse.builder()
-                        .productResponses(productResponses)
-                        .totalPages(totalPages)
+                Response.builder()
+                        .data(ProductListResponse.builder()
+                                .productResponses(productResponses)
+                                .totalPages(totalPages)
+                                .build())
+                        .status(HttpStatus.OK)
+                        .message("Get all products successfully")
                         .build()
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById (@PathVariable("id") Long productId) throws DataNotFoundException {
-        return ResponseEntity.ok(productService.getProductById(productId));
+    public ResponseEntity<Response> getProductById (@PathVariable("id") Long productId) throws DataNotFoundException {
+        ProductResponse productResponse = productService.getProductById(productId);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(productResponse)
+                        .status(HttpStatus.OK)
+                        .message("Get product successfully")
+                        .build()
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct (
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> updateProduct (
             @PathVariable("id") Long productId,
             @Valid @RequestBody ProductDTO productDTO,
             BindingResult result
-    ) {
-        try {
+    ) throws Exception {
             if (result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
+                return ResponseEntity.badRequest().body(
+                        Response.builder()
+                                .message(localizationUtils.getLocalizedMessage(MessagesKey.INVALID_ERROR, errorMessages))
+                                .status(HttpStatus.BAD_REQUEST)
+                                .build()
+                );
             }
-
-            return ResponseEntity.ok(productService.updateProduct(productId, productDTO));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+            ProductResponse productResponse = productService.updateProduct(productId, productDTO);
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .data(productResponse)
+                            .status(HttpStatus.OK)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.UPDATE_SUCCESSFULLY))
+                            .build()
+            );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct (@PathVariable("id") Long productId) throws DataNotFoundException {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> deleteProduct (@PathVariable("id") Long productId) throws DataNotFoundException {
         productService.deleteProduct(productId);
-        return ResponseEntity.ok("Delete Successfully");
+        return ResponseEntity.ok(
+                Response.builder()
+                        .message(localizationUtils.getLocalizedMessage(MessagesKey.DELETE_SUCCESSFULLY))
+                        .status(HttpStatus.OK)
+                        .build()
+        );
     }
 
     @GetMapping("/generate-fake-product")

@@ -25,7 +25,7 @@ public class Role extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
             cascade = {
                 CascadeType.PERSIST, CascadeType.DETACH,
                 CascadeType.MERGE, CascadeType.REFRESH

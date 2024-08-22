@@ -100,7 +100,7 @@ public class User extends BaseEntity implements UserDetails {
     )
     private List<Token> tokens;
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
         cascade = {
             CascadeType.PERSIST, CascadeType.DETACH,
             CascadeType.MERGE, CascadeType.REFRESH

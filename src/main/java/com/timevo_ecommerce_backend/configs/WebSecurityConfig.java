@@ -22,8 +22,8 @@ import java.util.List;
 import static org.springframework.http.HttpMethod.GET;
 
 @Configuration
-@EnableMethodSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
 
@@ -121,10 +121,9 @@ public class WebSecurityConfig {
                                     String.format("%s/actuator/**", apiPrefix)).permitAll()
                             .anyRequest()
                             .authenticated();
-
-
                 })
                 .csrf(AbstractHttpConfigurer::disable);
+
         http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
             @Override
             public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
@@ -139,7 +138,8 @@ public class WebSecurityConfig {
             }
         });
 
-
         return http.build();
+
     }
+
 }
