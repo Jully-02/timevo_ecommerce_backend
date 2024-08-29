@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.dtos.OrderDetailDTO;
 import com.timevo_ecommerce_backend.entities.*;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.repositories.*;
-import com.timevo_ecommerce_backend.responses.OrderDetailResponse;
+import com.timevo_ecommerce_backend.responses.order_detail.OrderDetailResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

@@ -5,7 +5,6 @@ import com.timevo_ecommerce_backend.dtos.ProductVariantDTO;
 import com.timevo_ecommerce_backend.entities.ProductVariant;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
-import com.timevo_ecommerce_backend.responses.ProductVariantResponse;
 import com.timevo_ecommerce_backend.responses.Response;
 import com.timevo_ecommerce_backend.services.variant.IProductVariantService;
 import com.timevo_ecommerce_backend.utils.MessagesKey;

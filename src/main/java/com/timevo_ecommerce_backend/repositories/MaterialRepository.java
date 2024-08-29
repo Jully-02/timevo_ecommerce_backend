@@ -1,7 +1,7 @@
 package com.timevo_ecommerce_backend.repositories;
 
 import com.timevo_ecommerce_backend.entities.Material;
-import com.timevo_ecommerce_backend.responses.MaterialResponse;
+import com.timevo_ecommerce_backend.responses.material.MaterialResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, Long> {
     boolean existsByName (String name);
-    @Query("SELECT new com.timevo_ecommerce_backend.responses.MaterialResponse(m.id, m.name, COUNT(pv)) " +
+    @Query("SELECT new com.timevo_ecommerce_backend.responses.material.MaterialResponse(m.id, m.name, COUNT(pv)) " +
             "FROM Material m " +
             "LEFT JOIN m.productVariants pv " +
             "GROUP BY m.id, m.name")

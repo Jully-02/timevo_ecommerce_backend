@@ -2,9 +2,8 @@ package com.timevo_ecommerce_backend.services.order;
 
 import com.timevo_ecommerce_backend.dtos.OrderDTO;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.OrderResponse;
+import com.timevo_ecommerce_backend.responses.order.OrderResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

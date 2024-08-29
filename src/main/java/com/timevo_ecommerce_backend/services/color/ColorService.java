@@ -5,7 +5,7 @@ import com.timevo_ecommerce_backend.entities.Color;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
 import com.timevo_ecommerce_backend.repositories.ColorRepository;
-import com.timevo_ecommerce_backend.responses.ColorResponse;
+import com.timevo_ecommerce_backend.responses.color.ColorResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

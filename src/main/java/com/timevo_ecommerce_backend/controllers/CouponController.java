@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.CouponDTO;
 import com.timevo_ecommerce_backend.entities.Coupon;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.CouponResponse;
+import com.timevo_ecommerce_backend.responses.coupon.CouponResponse;
 import com.timevo_ecommerce_backend.responses.Response;
 import com.timevo_ecommerce_backend.services.coupon.ICouponService;
 import com.timevo_ecommerce_backend.utils.MessagesKey;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -133,6 +132,7 @@ public class CouponController {
                 Response.builder()
                         .data(finalAmount)
                         .message("Calculate coupon successfully")
+                        .status(HttpStatus.OK)
                         .build()
         );
     }

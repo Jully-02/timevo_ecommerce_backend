@@ -30,4 +30,15 @@ public class GlobalExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(ExistDataException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<?> handleResourceExistDataException(ExistDataException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                Response.builder()
+                        .status(HttpStatus.CONFLICT)
+                        .message(exception.getMessage())
+                        .build()
+        );
+    }
 }

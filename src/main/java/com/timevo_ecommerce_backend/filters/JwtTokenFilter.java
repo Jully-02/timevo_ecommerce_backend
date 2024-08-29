@@ -70,7 +70,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/products**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products/images/**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/categories**", apiPrefix), "GET"),
-                Pair.of(String.format("%s/specifications**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/collections**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/colors**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/materials**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/screen-sizes**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/brands**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/banners**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
@@ -81,7 +84,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/payments/vn-pay-callback", apiPrefix), "GET"),
                 Pair.of(String.format("%s/shipping-methods**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/feedbacks/product/**", apiPrefix), "GET"),
-                Pair.of(String.format("%s/actuator/health", apiPrefix), "GET")
+                Pair.of(String.format("%s/actuator/**", apiPrefix), "GET"),
+
+                // Swagger
+                Pair.of("/api-docs","GET"),
+                Pair.of("/api-docs/**","GET"),
+                Pair.of("/swagger-resources","GET"),
+                Pair.of("/swagger-resources/**","GET"),
+                Pair.of("/configuration/ui","GET"),
+                Pair.of("/configuration/security","GET"),
+                Pair.of("/swagger-ui/**","GET"),
+                Pair.of("/swagger-ui.html", "GET"),
+                Pair.of("/swagger-ui/index.html", "GET")
         );
 
         String requestPath = request.getServletPath();

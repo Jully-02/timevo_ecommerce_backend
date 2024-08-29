@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.dtos.ColorDTO;
 import com.timevo_ecommerce_backend.entities.Color;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
-import com.timevo_ecommerce_backend.responses.ColorResponse;
+import com.timevo_ecommerce_backend.responses.color.ColorResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 

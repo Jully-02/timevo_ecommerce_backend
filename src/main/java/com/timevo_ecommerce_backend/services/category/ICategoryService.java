@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.dtos.CategoryDTO;
 import com.timevo_ecommerce_backend.entities.Category;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
-import com.timevo_ecommerce_backend.responses.CategoryResponse;
+import com.timevo_ecommerce_backend.responses.category.CategoryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 

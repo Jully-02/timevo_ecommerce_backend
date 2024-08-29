@@ -1,5 +1,6 @@
 package com.timevo_ecommerce_backend.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
 import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.ProductDTO;
@@ -9,8 +10,12 @@ import com.timevo_ecommerce_backend.entities.Color;
 import com.timevo_ecommerce_backend.entities.ProductImage;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.*;
+import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
+import com.timevo_ecommerce_backend.responses.product.ProductImageResponse;
+import com.timevo_ecommerce_backend.responses.product.ProductListResponse;
+import com.timevo_ecommerce_backend.responses.product.ProductResponse;
 import com.timevo_ecommerce_backend.services.color.IColorService;
-import com.timevo_ecommerce_backend.services.file_upload.IFileUploadService;
+import com.timevo_ecommerce_backend.services.product.IProductRedisService;
 import com.timevo_ecommerce_backend.services.product.IProductService;
 import com.timevo_ecommerce_backend.services.variant.IProductVariantService;
 import com.timevo_ecommerce_backend.utils.FileUploadUtil;
@@ -40,6 +45,7 @@ public class ProductController {
     private final IProductVariantService productVariantService;
     private final IColorService colorService;
     private final LocalizationUtils localizationUtils;
+    private final IProductRedisService productRedisService;
 
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -131,7 +137,7 @@ public class ProductController {
             @RequestParam(defaultValue = "default", name ="sort") String sortOption,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "16") int limit
-    ) {
+    ) throws JsonProcessingException {
         Sort sort = switch (sortOption) {
             case "popularity" -> Sort.by("id").descending();
             case "latest" -> Sort.by("createdAt").descending();
@@ -192,6 +198,8 @@ public class ProductController {
                 collections = null;
             }
         }
+//        Page<ProductResponse> productPage = productRedisService
+//                .getAllProducts(categoryIds, collectionIds, colorIds, materialIds, screenSizeIds, keyword, pageRequest);
         Page<ProductResponse> productPage = productService.searchProducts(
                 categories, categories == null ? 0 : categories.size(),
                 collections, collections == null ? 0 : collections.size(),

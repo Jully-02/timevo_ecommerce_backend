@@ -38,10 +38,24 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/login", apiPrefix),
+                                    String.format("%s/users/refresh-token", apiPrefix),
                                     String.format("%s/users/details", apiPrefix),
                                     String.format("%s/users/email-unique", apiPrefix),
-                                    String.format("%s/users/active-account", apiPrefix)
+                                    String.format("%s/users/active-account", apiPrefix),
 
+                                    //swagger
+                                    //"/v3/api-docs",
+                                    //"/v3/api-docs/**",
+                                    "/api-docs",
+                                    "/api-docs/**",
+                                    "/swagger-resources",
+                                    "/swagger-resources/**",
+                                    "/configuration/ui",
+                                    "/configuration/security",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html",
+                                    "/webjars/swagger-ui/**",
+                                    "/swagger-ui/index.html"
                             )
                             .permitAll()
 //                               .requestMatchers(HttpMethod.GET,
@@ -87,10 +101,17 @@ public class WebSecurityConfig {
                                     String.format("%s/categories/**", apiPrefix)).permitAll()
 
                             .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/collections/**", apiPrefix)).permitAll()
+
+                            .requestMatchers(HttpMethod.GET,
                                     String.format("%s/brands/**", apiPrefix)).permitAll()
 
                             .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/specifications/*", apiPrefix)).permitAll()
+                                    String.format("%s/colors/**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/screen-sizes/**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/materials/**", apiPrefix)).permitAll()
 
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/products**", apiPrefix)).permitAll()

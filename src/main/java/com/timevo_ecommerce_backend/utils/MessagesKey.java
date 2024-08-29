@@ -18,4 +18,6 @@ public class MessagesKey {
     public static final String UPDATE_FAILED = "update.update_failed";
     public static final String DELETE_SUCCESSFULLY = "delete.delete_successfully";
     public static final String DELETE_FAILED = "delete.delete_failed";
+
+    public static final String RESET_SUCCESSFULLY = "user.reset_password.successfully";
 }

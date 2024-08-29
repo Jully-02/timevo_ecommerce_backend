@@ -1,6 +1,7 @@
 package com.timevo_ecommerce_backend.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,5 +38,6 @@ public class CouponCondition {
     private String value;
 
     @Column(name = "discount_amount", nullable = false)
+    @JsonProperty("discount_amount")
     private BigDecimal discountAmount;
 }

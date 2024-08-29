@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.dtos.MaterialDTO;
 import com.timevo_ecommerce_backend.entities.Material;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
-import com.timevo_ecommerce_backend.responses.MaterialResponse;
+import com.timevo_ecommerce_backend.responses.material.MaterialResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 

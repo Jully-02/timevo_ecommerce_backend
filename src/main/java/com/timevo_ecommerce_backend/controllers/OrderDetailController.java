@@ -2,9 +2,8 @@ package com.timevo_ecommerce_backend.controllers;
 
 import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.OrderDetailDTO;
-import com.timevo_ecommerce_backend.entities.OrderDetail;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.OrderDetailResponse;
+import com.timevo_ecommerce_backend.responses.order_detail.OrderDetailResponse;
 import com.timevo_ecommerce_backend.responses.Response;
 import com.timevo_ecommerce_backend.services.order_detail.IOrderDetailService;
 import com.timevo_ecommerce_backend.utils.MessagesKey;

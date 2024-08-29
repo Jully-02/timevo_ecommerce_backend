@@ -5,7 +5,7 @@ import com.timevo_ecommerce_backend.entities.Category;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
 import com.timevo_ecommerce_backend.repositories.CategoryRepository;
-import com.timevo_ecommerce_backend.responses.CategoryResponse;
+import com.timevo_ecommerce_backend.responses.category.CategoryResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

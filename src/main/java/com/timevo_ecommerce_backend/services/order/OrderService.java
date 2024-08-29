@@ -5,12 +5,11 @@ import com.timevo_ecommerce_backend.dtos.OrderDTO;
 import com.timevo_ecommerce_backend.entities.*;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.repositories.*;
-import com.timevo_ecommerce_backend.responses.OrderResponse;
+import com.timevo_ecommerce_backend.responses.order.OrderResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 

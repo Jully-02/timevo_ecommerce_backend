@@ -2,10 +2,9 @@ package com.timevo_ecommerce_backend.controllers;
 
 import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.OrderDTO;
-import com.timevo_ecommerce_backend.entities.Order;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.OrderListResponse;
-import com.timevo_ecommerce_backend.responses.OrderResponse;
+import com.timevo_ecommerce_backend.responses.order.OrderListResponse;
+import com.timevo_ecommerce_backend.responses.order.OrderResponse;
 import com.timevo_ecommerce_backend.responses.Response;
 import com.timevo_ecommerce_backend.services.order.IOrderService;
 import com.timevo_ecommerce_backend.utils.MessagesKey;
@@ -59,7 +58,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN' or hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<Response> getOrder (@PathVariable("id") Long orderId) throws DataNotFoundException {
         OrderResponse orderResponse = orderService.getOrder(orderId);
         return ResponseEntity.ok(

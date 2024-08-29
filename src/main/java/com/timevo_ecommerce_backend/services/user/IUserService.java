@@ -4,12 +4,9 @@ import com.timevo_ecommerce_backend.dtos.UserDTO;
 import com.timevo_ecommerce_backend.dtos.UserUpdateDTO;
 import com.timevo_ecommerce_backend.entities.User;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.UserResponse;
+import com.timevo_ecommerce_backend.responses.user.UserResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface IUserService {
     UserResponse insertUser (UserDTO userDTO) throws Exception;

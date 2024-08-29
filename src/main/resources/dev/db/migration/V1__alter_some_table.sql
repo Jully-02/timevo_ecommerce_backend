@@ -1,0 +1,9 @@
+ALTER TABLE category MODIFY name VARCHAR(100) UNIQUE;
+
+ALTER TABLE product MODIFY price DECIMAL(10,2);
+
+ALTER TABLE `user` MODIFY COLUMN `phone_number` VARCHAR(15);
+
+ALTER TABLE order_detail MODIFY COLUMN price DECIMAL(10,2),
+    MODIFY COLUMN `quantity` INT DEFAULT 1,
+    MODIFY COLUMN `total_money` DECIMAL(10,2);

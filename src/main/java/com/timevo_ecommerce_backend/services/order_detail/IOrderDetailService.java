@@ -2,7 +2,7 @@ package com.timevo_ecommerce_backend.services.order_detail;
 
 import com.timevo_ecommerce_backend.dtos.OrderDetailDTO;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.OrderDetailResponse;
+import com.timevo_ecommerce_backend.responses.order_detail.OrderDetailResponse;
 
 import java.util.List;
 

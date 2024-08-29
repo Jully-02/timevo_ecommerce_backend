@@ -2,16 +2,12 @@ package com.timevo_ecommerce_backend.services.product;
 
 import com.timevo_ecommerce_backend.dtos.ProductDTO;
 import com.timevo_ecommerce_backend.dtos.ProductImageDTO;
-import com.timevo_ecommerce_backend.entities.Product;
-import com.timevo_ecommerce_backend.entities.ProductImage;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.exceptions.InvalidParamException;
-import com.timevo_ecommerce_backend.responses.CloudinaryResponse;
-import com.timevo_ecommerce_backend.responses.ProductImageResponse;
-import com.timevo_ecommerce_backend.responses.ProductResponse;
+import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
+import com.timevo_ecommerce_backend.responses.product.ProductImageResponse;
+import com.timevo_ecommerce_backend.responses.product.ProductResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

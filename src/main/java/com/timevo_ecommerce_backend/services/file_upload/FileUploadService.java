@@ -1,7 +1,7 @@
 package com.timevo_ecommerce_backend.services.file_upload;
 
 import com.cloudinary.Cloudinary;
-import com.timevo_ecommerce_backend.responses.CloudinaryResponse;
+import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

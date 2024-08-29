@@ -3,7 +3,7 @@ package com.timevo_ecommerce_backend.services.collection;
 import com.timevo_ecommerce_backend.dtos.CollectionDTO;
 import com.timevo_ecommerce_backend.entities.Collection;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
-import com.timevo_ecommerce_backend.responses.CollectionResponse;
+import com.timevo_ecommerce_backend.responses.collection.CollectionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 

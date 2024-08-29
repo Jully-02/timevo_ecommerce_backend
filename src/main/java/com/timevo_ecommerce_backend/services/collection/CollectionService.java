@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.dtos.CollectionDTO;
 import com.timevo_ecommerce_backend.entities.Collection;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.repositories.CollectionRepository;
-import com.timevo_ecommerce_backend.responses.CollectionResponse;
+import com.timevo_ecommerce_backend.responses.collection.CollectionResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;

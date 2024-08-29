@@ -4,7 +4,7 @@ import com.timevo_ecommerce_backend.dtos.ScreenSizeDTO;
 import com.timevo_ecommerce_backend.entities.ScreenSize;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.exceptions.ExistDataException;
-import com.timevo_ecommerce_backend.responses.ScreenSizeResponse;
+import com.timevo_ecommerce_backend.responses.screen_size.ScreenSizeResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
