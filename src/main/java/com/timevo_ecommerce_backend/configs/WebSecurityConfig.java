@@ -136,6 +136,9 @@ public class WebSecurityConfig {
                                     String.format("%s/orders/user/**", apiPrefix)).permitAll()
 
                             .requestMatchers(GET,
+                                    String.format("%s/feedbacks/*", apiPrefix)).permitAll()
+
+                            .requestMatchers(GET,
                                     String.format("%s/feedbacks/product/**", apiPrefix)).permitAll()
 
                             .requestMatchers(GET,
