@@ -160,6 +160,27 @@ public class UserController {
         );
     }
 
+    @GetMapping("/email-unique")
+    public ResponseEntity<Response> emailUnique (@RequestParam("email") String email) {
+        boolean isUnique = userService.emailUnique(email);
+        if (!isUnique) {
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .status(HttpStatus.OK)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.EMAIL_NOT_EXIST))
+                            .data(true)
+                            .build()
+            );
+        }
+        return ResponseEntity.ok(
+                Response.builder()
+                        .message(localizationUtils.getLocalizedMessage(MessagesKey.EMAIL_EXIST))
+                        .status(HttpStatus.OK)
+                        .data(false)
+                        .build()
+        );
+    }
+
     @GetMapping("/active-account")
     public ResponseEntity<?> activeAccount(
             @RequestParam("email") String email,
