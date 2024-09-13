@@ -104,6 +104,14 @@ public class CartItemService implements ICartItemService {
         ScreenSize existingScreenSize = screenSizeRepository.findById(cartItemDTO.getScreenSizeId())
                 .orElseThrow(() -> new DataNotFoundException("Cannot find Screen size with ID = " + cartItemDTO.getScreenSizeId()));
 
+        if (!productVariantRepository.existsByProductIdAndColorIdAndMaterialIdAndScreenSizeId(
+                existingProduct.getId(),
+                existingColor.getId(),
+                existingMaterial.getId(),
+                existingScreenSize.getId()
+        )) {
+            throw new DataNotFoundException("No products found with these attributes");
+        }
 
         existingCartItem.setQuantity(cartItemDTO.getQuantity());
         existingCartItem.setUser(existingUser);

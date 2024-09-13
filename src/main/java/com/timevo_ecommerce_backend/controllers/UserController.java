@@ -168,7 +168,7 @@ public class UserController {
                     Response.builder()
                             .status(HttpStatus.OK)
                             .message(localizationUtils.getLocalizedMessage(MessagesKey.EMAIL_NOT_EXIST))
-                            .data(true)
+                            .data(false)
                             .build()
             );
         }
@@ -176,7 +176,7 @@ public class UserController {
                 Response.builder()
                         .message(localizationUtils.getLocalizedMessage(MessagesKey.EMAIL_EXIST))
                         .status(HttpStatus.OK)
-                        .data(false)
+                        .data(true)
                         .build()
         );
     }
