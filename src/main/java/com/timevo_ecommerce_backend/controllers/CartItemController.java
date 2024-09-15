@@ -29,7 +29,7 @@ public class CartItemController {
 
 
     @PostMapping("")
-    public ResponseEntity<Response> insertCartItem (
+    public ResponseEntity<Response> insertCartItem(
             @Valid @RequestBody CartItemDTO cartItemDTO,
             BindingResult result
     ) throws DataNotFoundException {
@@ -58,6 +58,7 @@ public class CartItemController {
                                         .screenSizeId(cartItem.getScreenSize().getId())
                                         .userId(cartItem.getUser().getId())
                                         .quantity(cartItem.getQuantity())
+                                        .id(cartItem.getId())
                                         .build()
                         )
                         .build()
@@ -66,7 +67,7 @@ public class CartItemController {
 
     @GetMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> getAllCartItems () {
+    public ResponseEntity<Response> getAllCartItems() {
         List<CartItem> cartItems = cartItemService.getAllCartItems();
         List<CartItemResponse> cartItemResponses = cartItems.stream()
                 .map(cartItem -> CartItemResponse.builder()
@@ -76,6 +77,7 @@ public class CartItemController {
                         .screenSizeId(cartItem.getScreenSize().getId())
                         .userId(cartItem.getUser().getId())
                         .quantity(cartItem.getQuantity())
+                        .id(cartItem.getId())
                         .build()
                 ).toList();
         return ResponseEntity.ok(
@@ -88,8 +90,8 @@ public class CartItemController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN)")
-    public ResponseEntity<Response> getCartItemById (@PathVariable("id") Long id) throws Exception {
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> getCartItemById(@PathVariable("id") Long id) throws Exception {
         CartItem cartItem = cartItemService.getCartItemById(id);
         return ResponseEntity.ok(
                 Response.builder()
@@ -102,6 +104,7 @@ public class CartItemController {
                                         .screenSizeId(cartItem.getScreenSize().getId())
                                         .userId(cartItem.getUser().getId())
                                         .quantity(cartItem.getQuantity())
+                                        .id(cartItem.getId())
                                         .build()
                         )
                         .message("Get cart item successfully")
@@ -111,7 +114,7 @@ public class CartItemController {
 
     @GetMapping("/users/{user-id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> getCartItemByUserId (@PathVariable("user-id") Long userId) throws Exception {
+    public ResponseEntity<Response> getCartItemByUserId(@PathVariable("user-id") Long userId) throws Exception {
         List<CartItem> cartItems = cartItemService.findByUserId(userId);
         List<CartItemResponse> cartItemResponses = cartItems.stream()
                 .map(cartItem -> CartItemResponse.builder()
@@ -121,6 +124,7 @@ public class CartItemController {
                         .screenSizeId(cartItem.getScreenSize().getId())
                         .userId(cartItem.getUser().getId())
                         .quantity(cartItem.getQuantity())
+                        .id(cartItem.getId())
                         .build()
                 ).toList();
         return ResponseEntity.ok(
@@ -134,7 +138,7 @@ public class CartItemController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> updateCartItem (
+    public ResponseEntity<Response> updateCartItem(
             @PathVariable("id") Long id,
             @Valid @RequestBody CartItemDTO cartItemDTO,
             BindingResult result
@@ -143,10 +147,22 @@ public class CartItemController {
             List<String> errorMessage = result.getFieldErrors().stream()
                     .map(FieldError::getDefaultMessage)
                     .toList();
+            CartItem cartItem = cartItemService.updateCartItem(id, cartItemDTO);
             return ResponseEntity.badRequest().body(
                     Response.builder()
                             .status(HttpStatus.BAD_REQUEST)
                             .message(localizationUtils.getLocalizedMessage(MessagesKey.INVALID_ERROR, errorMessage.toString()))
+                            .data(
+                                    CartItemResponse.builder()
+                                            .productId(cartItem.getProduct().getId())
+                                            .colorId(cartItem.getColor().getId())
+                                            .materialId(cartItem.getMaterial().getId())
+                                            .screenSizeId(cartItem.getScreenSize().getId())
+                                            .userId(cartItem.getUser().getId())
+                                            .quantity(cartItem.getQuantity())
+                                            .id(cartItem.getId())
+                                            .build()
+                            )
                             .build()
             );
         }
@@ -161,6 +177,7 @@ public class CartItemController {
                                 .screenSizeId(cartItem.getScreenSize().getId())
                                 .userId(cartItem.getUser().getId())
                                 .quantity(cartItem.getQuantity())
+                                .id(cartItem.getId())
                                 .build())
                         .status(HttpStatus.OK)
                         .build()
@@ -169,7 +186,7 @@ public class CartItemController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> deleteCartItem (@PathVariable("id") Long id) {
+    public ResponseEntity<Response> deleteCartItem(@PathVariable("id") Long id) {
         cartItemService.deleteCartItem(id);
         return ResponseEntity.ok(
                 Response.builder()
@@ -181,7 +198,7 @@ public class CartItemController {
 
     @DeleteMapping("/user-product")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> deleteCartItemByUserIdAndProductIdAndAttributes (
+    public ResponseEntity<Response> deleteCartItemByUserIdAndProductIdAndAttributes(
             @RequestParam("user-id") Long userId,
             @RequestParam("product-id") Long productId,
             @RequestParam("color-id") Long colorId,
@@ -199,7 +216,7 @@ public class CartItemController {
 
     @DeleteMapping("/user/{user-id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> deleteCartItemByUserId (
+    public ResponseEntity<Response> deleteCartItemByUserId(
             @PathVariable("user-id") Long userId
     ) {
         cartItemService.deleteCartItemByUserId(userId);

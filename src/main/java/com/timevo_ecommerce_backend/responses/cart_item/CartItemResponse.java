@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CartItemResponse {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("user_id")
     private Long userId;
 
