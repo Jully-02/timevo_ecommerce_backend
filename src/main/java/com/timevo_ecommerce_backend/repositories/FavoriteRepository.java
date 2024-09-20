@@ -13,10 +13,22 @@ import java.util.List;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Favorite> findByUserId (Long userId);
 
-    @Query("SELECT f FROM Favorite f WHERE f.user.id = :userId AND f.product.id = :productId")
-    Favorite findByUserIdAndProductId (Long userId, Long productId);
+    @Query("SELECT f FROM Favorite f WHERE f.user.id = :userId AND f.product.id = :productId AND f.color.id = :colorId AND f.material.id = :materialId AND f.screenSize.id = :screenSizeId")
+    Favorite findByUserIdAndProductIdAndAttributes (
+            Long userId,
+            Long productId,
+            Long colorId,
+            Long materialId,
+            Long screenSizeId
+    );
 
-    @Query("DELETE FROM Favorite f WHERE f.user.id = :userId AND f.product.id = :productId")
+    @Query("DELETE FROM Favorite f WHERE f.user.id = :userId AND f.product.id = :productId AND f.color.id = :colorId AND f.material.id = :materialId AND f.screenSize.id = :screenSizeId")
     @Modifying
-    void deleteByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId);
+    void deleteByUserIdAndProductIdAndAttributes (
+            @Param("userId") Long userId,
+            @Param("productId") Long productId,
+            @Param("colorId") Long colorId,
+            @Param("materialId") Long materialId,
+            @Param("screenSizeId") Long screenSizeId
+    );
 }
