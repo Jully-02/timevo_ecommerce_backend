@@ -5,11 +5,14 @@ import com.timevo_ecommerce_backend.dtos.FavoriteDTO;
 import com.timevo_ecommerce_backend.entities.Favorite;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.Response;
+import com.timevo_ecommerce_backend.responses.favorite.FavoriteListResponse;
 import com.timevo_ecommerce_backend.responses.favorite.FavoriteResponse;
 import com.timevo_ecommerce_backend.services.favorite.IFavoriteService;
 import com.timevo_ecommerce_backend.utils.MessagesKey;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -109,21 +112,35 @@ public class FavoriteController {
 
     @GetMapping("/user/{user-id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Response> getFavoritesByUserId(@PathVariable("user-id") Long userId) throws Exception {
-        List<Favorite> favorites = favoriteService.findByUserId(userId);
+    public ResponseEntity<Response> getFavoritesByUserId(
+            @PathVariable("user-id") Long userId,
+            @RequestParam(defaultValue = "0", name = "page") int page,
+            @RequestParam(defaultValue = "6", name = "limit") int limit
+    ) throws Exception {
+        PageRequest pageRequest = PageRequest.of(
+                page, limit
+        );
+        Page<Favorite> favoritePage = favoriteService.findByUserId(userId, pageRequest);
+        List<Favorite> favorites = favoritePage.getContent();
+        int totalPages = favoritePage.getTotalPages();
         return ResponseEntity.ok(
                 Response.builder()
                         .data(
-                                favorites.stream().map(
-                                        favorite -> FavoriteResponse.builder()
-                                                .userId(favorite.getUser().getId())
-                                                .productId(favorite.getProduct().getId())
-                                                .colorId(favorite.getColor().getId())
-                                                .screenSizeId(favorite.getScreenSize().getId())
-                                                .materialId(favorite.getMaterial().getId())
-                                                .id(favorite.getId())
-                                                .build()
-                                ).toList()
+                                FavoriteListResponse.builder()
+                                        .favoriteResponses(
+                                                favorites.stream().map(
+                                                        favorite -> FavoriteResponse.builder()
+                                                                .userId(favorite.getUser().getId())
+                                                                .productId(favorite.getProduct().getId())
+                                                                .colorId(favorite.getColor().getId())
+                                                                .screenSizeId(favorite.getScreenSize().getId())
+                                                                .materialId(favorite.getMaterial().getId())
+                                                                .id(favorite.getId())
+                                                                .build()
+                                                ).toList()
+                                        )
+                                        .totalPages(totalPages)
+                                        .build()
                         )
                         .message("Get favorites successfully")
                         .status(HttpStatus.OK)

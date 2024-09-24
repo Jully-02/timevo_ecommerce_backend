@@ -8,6 +8,8 @@ import com.timevo_ecommerce_backend.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -123,8 +125,8 @@ public class FavoriteService implements IFavoriteService {
     }
 
     @Override
-    public List<Favorite> findByUserId(Long userId) throws Exception {
-        return favoriteRepository.findByUserId(userId);
+    public Page<Favorite> findByUserId(Long userId, PageRequest pageRequest) throws Exception {
+        return favoriteRepository.findByUserId(userId, pageRequest);
     }
 
     @Override
