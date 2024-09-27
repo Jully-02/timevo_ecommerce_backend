@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -115,10 +116,17 @@ public class FavoriteController {
     public ResponseEntity<Response> getFavoritesByUserId(
             @PathVariable("user-id") Long userId,
             @RequestParam(defaultValue = "0", name = "page") int page,
-            @RequestParam(defaultValue = "6", name = "limit") int limit
+            @RequestParam(defaultValue = "6", name = "limit") int limit,
+            @RequestParam(defaultValue = "default", name ="sort") String sortOption
     ) throws Exception {
+        Sort sort = switch (sortOption) {
+            case "latest" -> Sort.by("createdAt").descending();
+            case "oldest" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("id").ascending();
+        };
+
         PageRequest pageRequest = PageRequest.of(
-                page, limit
+                page, limit, sort
         );
         Page<Favorite> favoritePage = favoriteService.findByUserId(userId, pageRequest);
         List<Favorite> favorites = favoritePage.getContent();
