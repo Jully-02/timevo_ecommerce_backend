@@ -147,6 +147,7 @@ public class FavoriteController {
                                                                 .build()
                                                 ).toList()
                                         )
+                                        .totalProducts(favoriteService.totalProductsByUserId(userId))
                                         .totalPages(totalPages)
                                         .build()
                         )

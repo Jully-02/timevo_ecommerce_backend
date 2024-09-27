@@ -134,4 +134,9 @@ public class FavoriteService implements IFavoriteService {
     public void deleteFavoriteByUserIdAndProductIdAndAttributes(Long userId, Long productId, Long colorId, Long materialId, Long screenSizeId) {
         favoriteRepository.deleteByUserIdAndProductIdAndAttributes(userId, productId, colorId, materialId, screenSizeId);
     }
+
+    @Override
+    public long totalProductsByUserId (Long userId) {
+        return favoriteRepository.countByUserId(userId);
+    }
 }

@@ -21,5 +21,7 @@ public interface IFavoriteService {
 
     Page<Favorite> findByUserId (Long userId, PageRequest pageRequest) throws Exception;
 
+    long totalProductsByUserId (Long userId);
+
     void deleteFavoriteByUserIdAndProductIdAndAttributes (Long userId, Long productId, Long colorId, Long materialId, Long screenSizeId);
 }

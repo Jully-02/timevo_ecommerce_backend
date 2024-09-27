@@ -15,6 +15,8 @@ import java.util.List;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     Page<Favorite> findByUserId (Long userId, Pageable pageable);
 
+    long countByUserId (Long userId);
+
     @Query("SELECT f FROM Favorite f WHERE f.user.id = :userId AND f.product.id = :productId AND f.color.id = :colorId AND f.material.id = :materialId AND f.screenSize.id = :screenSizeId")
     Favorite findByUserIdAndProductIdAndAttributes (
             Long userId,

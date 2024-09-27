@@ -17,6 +17,9 @@ public class FavoriteListResponse {
     @JsonProperty("favorite_responses")
     private List<FavoriteResponse> favoriteResponses;
 
+    @JsonProperty("total_products")
+    private long totalProducts;
+
     @JsonProperty("total_pages")
     private int totalPages;
 }
