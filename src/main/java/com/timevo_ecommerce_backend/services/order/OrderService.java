@@ -92,7 +92,7 @@ public class OrderService implements IOrderService{
             orderDetail.setColor(existingColor);
             orderDetail.setMaterial(existingMaterial);
             orderDetail.setScreenSize(existingScreenSize);
-            orderDetail.setPrice(existingProduct.getPrice());
+            orderDetail.setPrice(existingProduct.getPrice() * (1 - existingProduct.getDiscount() / 100));
             orderDetail.setTotalMoney(orderDetail.getQuantity() * orderDetail.getPrice());
             subTotal += orderDetail.getTotalMoney();
             orderDetails.add(orderDetail);
