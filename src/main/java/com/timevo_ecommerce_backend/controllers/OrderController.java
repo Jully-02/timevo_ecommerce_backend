@@ -2,6 +2,7 @@ package com.timevo_ecommerce_backend.controllers;
 
 import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.OrderDTO;
+import com.timevo_ecommerce_backend.entities.Order;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.order.OrderListResponse;
 import com.timevo_ecommerce_backend.responses.order.OrderResponse;
@@ -10,6 +11,7 @@ import com.timevo_ecommerce_backend.services.order.IOrderService;
 import com.timevo_ecommerce_backend.utils.MessagesKey;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,6 +31,7 @@ public class OrderController {
 
     private final IOrderService orderService;
     private final LocalizationUtils localizationUtils;
+    private final ModelMapper modelMapper;
 
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -98,11 +101,43 @@ public class OrderController {
 
     @GetMapping("/user/{user_id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<Response> getOrderByUser (@PathVariable("user_id") Long userId) {
-        List<OrderResponse> orderResponses = orderService.findByUserId(userId);
+    public ResponseEntity<Response> getOrderByUser (
+            @PathVariable("user_id") Long userId,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "limit", defaultValue = "16") int limit,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "sort", defaultValue = "default") String sortOption
+    ) {
+        Sort sort = switch (sortOption) {
+            case "high" -> Sort.by("totalMoney").descending();
+            case "low" -> Sort.by("totalMoney").ascending();
+            case "latest" -> Sort.by("createdAt").descending();
+            case "oldest" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("id").ascending();
+        };
+        PageRequest pageRequest = PageRequest.of(
+                page, limit, sort
+        );
+        Page<Order> orderPage = orderService.findByUserIdAndKeyword(userId, pageRequest, keyword);
+        List<OrderResponse> orderResponses = orderPage.getContent().stream()
+                .map(order -> {
+                    OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+                    orderResponse.setPaymentMethodId(order.getPaymentMethod().getId());
+                    orderResponse.setShippingMethodId(order.getShippingMethod().getId());
+                    orderResponse.setUserId(order.getUser().getId());
+                    orderResponse.setShippingMethodName(order.getShippingMethod().getName());
+                    orderResponse.setPaymentMethodName(order.getPaymentMethod().getName());
+                    return orderResponse;
+                }).toList();
         return ResponseEntity.ok(
                 Response.builder()
-                        .data(orderResponses)
+                        .data(
+                                OrderListResponse.builder()
+                                        .orderResponses(orderResponses)
+                                        .totalPages(orderPage.getTotalPages())
+                                        .totalOrders(orderService.totalOrdersByUserId(userId))
+                                        .build()
+                        )
                         .message("Get orders by user successfully")
                         .status(HttpStatus.OK)
                         .build()

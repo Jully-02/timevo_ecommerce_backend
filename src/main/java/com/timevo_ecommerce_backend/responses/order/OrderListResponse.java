@@ -19,4 +19,7 @@ public class OrderListResponse {
 
     @JsonProperty("total_pages")
     private int totalPages;
+
+    @JsonProperty("total_orders")
+    private long totalOrders;
 }

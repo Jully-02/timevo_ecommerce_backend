@@ -48,6 +48,16 @@ jwt:
   expiration-refresh-token: 5184000 #60 days
   secretKey: jtc6zcRYQr5lZj4UCIwkIbLjpP/AhDbSiZhUHa5VoGw=
 
+payment:
+  vnPay:
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    tmnCode: QNXWOWFK
+    secretKey: XUVRV7PLKWLSH9WA0ULLK7OFVLA416RS
+    returnUrl: http://localhost:8080/api/v1/payments/vn-pay-callback
+    version: 2.1.0
+    command: pay
+    orderType: other
+
 logging:
   level:
     org:

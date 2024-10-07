@@ -22,5 +22,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "o.phoneNumber LIKE %:keyword%)")
     Page<Order> findAll (@Param("keyword") String keyword, Pageable pageable);
 
-    List<Order> findByUserId (Long userId);
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId " +
+            "AND (:keyword IS NULL OR :keyword = '' " +
+            "OR o.phoneNumber LIKE %:keyword% " +
+            "OR o.address LIKE %:keyword% " +
+            "OR o.note LIKE %:keyword% " +
+            "OR o.shippingAddress LIKE %:keyword%)")
+    Page<Order> findByUserIdAndKeyword(@Param("userId") Long userId,
+                                       @Param("keyword") String keyword,
+                                       Pageable pageable);
+
+    long countByUserId (Long userId);
 }

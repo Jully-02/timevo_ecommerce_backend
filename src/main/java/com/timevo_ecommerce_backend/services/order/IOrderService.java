@@ -1,6 +1,7 @@
 package com.timevo_ecommerce_backend.services.order;
 
 import com.timevo_ecommerce_backend.dtos.OrderDTO;
+import com.timevo_ecommerce_backend.entities.Order;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.order.OrderResponse;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,9 @@ public interface IOrderService {
 
     OrderResponse updateOrder (Long id, OrderDTO orderDTO) throws DataNotFoundException;
 
-    List<OrderResponse> findByUserId (Long id);
+    Page<Order> findByUserIdAndKeyword (Long id, Pageable pageable, String keyword);
 
     void deleteOrder (Long id) throws DataNotFoundException;
+
+    long totalOrdersByUserId (Long userId);
 }

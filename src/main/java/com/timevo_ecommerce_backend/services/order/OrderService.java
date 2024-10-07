@@ -189,18 +189,8 @@ public class OrderService implements IOrderService{
     }
 
     @Override
-    public List<OrderResponse> findByUserId(Long id) {
-        List<Order> orders = orderRepository.findByUserId(id);
-        return orders.stream()
-                .map(order -> {
-                    OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
-                    orderResponse.setPaymentMethodId(order.getPaymentMethod().getId());
-                    orderResponse.setShippingMethodId(order.getShippingMethod().getId());
-                    orderResponse.setUserId(order.getUser().getId());
-                    orderResponse.setShippingMethodName(order.getShippingMethod().getName());
-                    orderResponse.setPaymentMethodName(order.getPaymentMethod().getName());
-                    return orderResponse;
-                }).toList();
+    public Page<Order> findByUserIdAndKeyword(Long id, Pageable pageable, String keyword) {
+        return orderRepository.findByUserIdAndKeyword(id, keyword, pageable);
     }
 
     @Override
@@ -210,5 +200,10 @@ public class OrderService implements IOrderService{
                 .orElseThrow(() -> new DataNotFoundException("Cannot find Order with ID = " + id));
         existingOrder.setActive(false);
         orderRepository.save(existingOrder);
+    }
+
+    @Override
+    public long totalOrdersByUserId (Long userId) {
+        return orderRepository.countByUserId(userId);
     }
 }
