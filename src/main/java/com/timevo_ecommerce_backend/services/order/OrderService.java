@@ -203,6 +203,13 @@ public class OrderService implements IOrderService{
     }
 
     @Override
+    @Transactional
+    public void hardDeleteOrder (Long id) {
+        orderRepository.deleteById(id);
+    }
+
+
+    @Override
     public long totalOrdersByUserId (Long userId) {
         return orderRepository.countByUserId(userId);
     }

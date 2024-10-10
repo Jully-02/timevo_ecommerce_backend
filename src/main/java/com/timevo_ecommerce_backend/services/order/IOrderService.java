@@ -23,5 +23,7 @@ public interface IOrderService {
 
     void deleteOrder (Long id) throws DataNotFoundException;
 
+    void hardDeleteOrder (Long id);
+
     long totalOrdersByUserId (Long userId);
 }

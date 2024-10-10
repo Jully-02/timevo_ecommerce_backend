@@ -16,4 +16,6 @@ public interface IOrderDetailService {
     List<OrderDetailResponse> findByOrderId (Long orderId);
 
     void deleteOrderDetail (Long id);
+
+    void deleteOrderDetailByOrderId (Long orderId);
 }
