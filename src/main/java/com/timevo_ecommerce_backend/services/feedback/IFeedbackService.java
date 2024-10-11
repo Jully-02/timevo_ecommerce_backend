@@ -1,7 +1,10 @@
 package com.timevo_ecommerce_backend.services.feedback;
 
 import com.timevo_ecommerce_backend.dtos.FeedbackDTO;
+import com.timevo_ecommerce_backend.entities.Feedback;
 import com.timevo_ecommerce_backend.responses.feedback.FeedbackResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,9 +15,13 @@ public interface IFeedbackService {
 
     FeedbackResponse getFeedBackById (long id) throws Exception;
 
-    List<FeedbackResponse> getFeedBackByProductId  (long productId);
+    Page<Feedback> getFeedBackByProductId  (long productId, Pageable pageable);
 
-    List<FeedbackResponse> getFeedBackByUserId (long userId);
+    Page<Feedback> getFeedBackByUserId (long userId, Pageable pageable);
 
     void deleteFeedBackById (long id);
+
+    long countByUserId (Long userId);
+
+    long countByProductId (Long productId);
 }

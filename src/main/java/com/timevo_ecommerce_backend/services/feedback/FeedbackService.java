@@ -12,6 +12,8 @@ import com.timevo_ecommerce_backend.responses.feedback.FeedbackResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,31 +85,23 @@ public class FeedbackService implements IFeedbackService {
     }
 
     @Override
-    public List<FeedbackResponse> getFeedBackByProductId(long productId) {
-        List<Feedback> feedbacks = feedbackRepository.findByProductId(productId);
-
-        return feedbacks.stream()
-                .map(feedback -> {
-                    FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
-                    feedbackResponse.setUserId(feedback.getUser().getId());
-                    feedbackResponse.setProductId(feedback.getProduct().getId());
-                    feedbackResponse.setName(feedback.getUser().getFullName());
-                    return feedbackResponse;
-                }).toList();
+    public Page<Feedback> getFeedBackByProductId(long productId, Pageable pageable) {
+        return feedbackRepository.findByProductId(productId, pageable);
     }
 
     @Override
-    public List<FeedbackResponse> getFeedBackByUserId(long userId) {
-        List<Feedback> feedbacks = feedbackRepository.findByUserId(userId);
+    public Page<Feedback> getFeedBackByUserId(long userId, Pageable pageable) {
+        return feedbackRepository.findByUserId(userId, pageable);
+    }
 
-        return feedbacks.stream()
-                .map(feedback -> {
-                    FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
-                    feedbackResponse.setUserId(feedback.getUser().getId());
-                    feedbackResponse.setProductId(feedback.getProduct().getId());
-                    feedbackResponse.setName(feedback.getUser().getFullName());
-                    return feedbackResponse;
-                }).toList();
+    @Override
+    public long countByUserId (Long userId) {
+        return feedbackRepository.countByUserId(userId);
+    }
+
+    @Override
+    public long countByProductId (Long productId) {
+        return feedbackRepository.countByProductId(productId);
     }
 
     @Override
