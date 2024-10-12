@@ -46,7 +46,7 @@ public class PaymentController {
             OrderDTO orderDTO = modelMapper.map(orderResponse, OrderDTO.class);
             orderDTO.setPaymentStatus(true);
             orderService.updateOrder(Long.valueOf(orderId), orderDTO);
-            response.sendRedirect("http://localhost:3000/checkout?vnp_ResponseCode=" + status + "order_Id=" + orderId);
+            response.sendRedirect("http://localhost:3000/checkout?vnp_ResponseCode=" + status + "&order_Id=" + orderId);
         } else {
             orderDetailService.deleteOrderDetailByOrderId(Long.valueOf(orderId));
             orderService.hardDeleteOrder(Long.valueOf(orderId));

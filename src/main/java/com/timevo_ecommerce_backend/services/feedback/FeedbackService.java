@@ -43,7 +43,8 @@ public class FeedbackService implements IFeedbackService {
         FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
         feedbackResponse.setProductId(feedback.getProduct().getId());
         feedbackResponse.setUserId(feedback.getUser().getId());
-        feedbackResponse.setName(feedback.getUser().getFullName());
+        feedbackResponse.setFirstName(feedback.getUser().getFirstName());
+        feedbackResponse.setLastName(feedback.getUser().getLastName());
         return feedbackResponse;
     }
 
@@ -68,7 +69,8 @@ public class FeedbackService implements IFeedbackService {
         FeedbackResponse feedbackResponse = modelMapper.map(feedbackExisting, FeedbackResponse.class);
         feedbackResponse.setProductId(feedbackExisting.getProduct().getId());
         feedbackResponse.setUserId(feedbackExisting.getUser().getId());
-        feedbackResponse.setName(feedbackExisting.getUser().getFullName());
+        feedbackResponse.setFirstName(feedbackExisting.getUser().getFirstName());
+        feedbackResponse.setLastName(feedbackExisting.getUser().getLastName());
         return feedbackResponse;
     }
 
@@ -80,7 +82,8 @@ public class FeedbackService implements IFeedbackService {
         FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
         feedbackResponse.setProductId(feedback.getProduct().getId());
         feedbackResponse.setUserId(feedback.getUser().getId());
-        feedbackResponse.setName(feedback.getUser().getFullName());
+        feedbackResponse.setFirstName(feedback.getUser().getFirstName());
+        feedbackResponse.setLastName(feedback.getUser().getLastName());
         return feedbackResponse;
     }
 

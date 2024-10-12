@@ -141,6 +141,7 @@ public class ProductController {
         Sort sort = switch (sortOption) {
             case "popularity" -> Sort.by("id").descending();
             case "latest" -> Sort.by("createdAt").descending();
+            case "oldest" -> Sort.by("createdAd").ascending();
             case "high" -> Sort.by("price").descending();
             case "low" -> Sort.by("price").ascending();
             default -> Sort.by("id").ascending(); // Default sorting

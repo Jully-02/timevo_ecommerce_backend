@@ -135,7 +135,8 @@ public class FeedbackController {
                     FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
                     feedbackResponse.setUserId(feedback.getUser().getId());
                     feedbackResponse.setProductId(feedback.getProduct().getId());
-                    feedbackResponse.setName(feedback.getUser().getFullName());
+                    feedbackResponse.setFirstName(feedback.getUser().getFirstName());
+                    feedbackResponse.setLastName(feedback.getUser().getLastName());
                     return feedbackResponse;
                 }).toList();
         return ResponseEntity.ok(
@@ -175,7 +176,8 @@ public class FeedbackController {
                             FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
                             feedbackResponse.setUserId(feedback.getUser().getId());
                             feedbackResponse.setProductId(feedback.getProduct().getId());
-                            feedbackResponse.setName(feedback.getUser().getFullName());
+                            feedbackResponse.setFirstName(feedback.getUser().getFirstName());
+                            feedbackResponse.setLastName(feedback.getUser().getLastName());
                             return feedbackResponse;
                         }).toList();
         return ResponseEntity.ok(

@@ -62,7 +62,7 @@ public class OrderService implements IOrderService{
         orderRepository.save(order);
 
         List<OrderDetail> orderDetails = new ArrayList<>();
-        int subTotal = 0;
+        float subTotal = 0;
         for (CartItemDTO cartItemDTO : orderDTO.getCartItems()) {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(order);
