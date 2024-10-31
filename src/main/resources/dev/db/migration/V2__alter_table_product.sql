@@ -1,0 +1,1 @@
+ALTER TABLE `product` MODIFY COLUMN specification TEXT;

@@ -29,4 +29,15 @@ public class FileUploadService implements IFileUploadService{
             throw new Exception("Failed to upload file");
         }
     }
+
+    @Override
+    @Transactional
+    public boolean removeFile(String publicId) throws Exception {
+        try {
+            Map result = cloudinary.uploader().destroy(publicId, Map.of("invalidate", true));
+            return "ok".equals(result.get("result"));
+        } catch (Exception e) {
+            throw new Exception("Failed to delete file");
+        }
+    }
 }

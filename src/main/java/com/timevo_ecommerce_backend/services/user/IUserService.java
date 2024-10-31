@@ -4,9 +4,11 @@ import com.timevo_ecommerce_backend.dtos.UserDTO;
 import com.timevo_ecommerce_backend.dtos.UserUpdateDTO;
 import com.timevo_ecommerce_backend.entities.User;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
+import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
 import com.timevo_ecommerce_backend.responses.user.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IUserService {
     UserResponse insertUser (UserDTO userDTO) throws Exception;
@@ -23,9 +25,14 @@ public interface IUserService {
 
     UserResponse updateUser (Long userId, UserUpdateDTO userDTO) throws Exception;
 
+    UserResponse updateAvatarUser (Long userId, String avatarUrl, String avatarName) throws Exception;
+
     User getUserDetailsFromRefreshToken (String refreshToken) throws  Exception;
 
     void resetPassword (Long userId, String newPassword) throws DataNotFoundException;
 
-    void blockOrEnable (Long userId, Boolean active) throws DataNotFoundException;
+    User blockOrEnable (Long userId) throws DataNotFoundException;
+
+    CloudinaryResponse uploadImage(MultipartFile file) throws Exception;
+
 }

@@ -11,8 +11,11 @@ import com.timevo_ecommerce_backend.exceptions.PermissionDenyException;
 import com.timevo_ecommerce_backend.repositories.RoleRepository;
 import com.timevo_ecommerce_backend.repositories.TokenRepository;
 import com.timevo_ecommerce_backend.repositories.UserRepository;
+import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
 import com.timevo_ecommerce_backend.responses.user.UserResponse;
 import com.timevo_ecommerce_backend.services.email.IEmailService;
+import com.timevo_ecommerce_backend.services.file_upload.IFileUploadService;
+import com.timevo_ecommerce_backend.utils.FileUploadUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,10 +27,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class UserService implements IUserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
+    private final IFileUploadService fileUploadService;
 
 
     @Override
@@ -131,8 +134,7 @@ public class UserService implements IUserService {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             return user.get();
-        }
-        else {
+        } else {
             throw new Exception("User not found");
         }
     }
@@ -149,11 +151,33 @@ public class UserService implements IUserService {
     public UserResponse updateUser(Long userId, UserUpdateDTO userDTO) throws Exception {
         User exisitingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find User with ID = " + userId));
-        exisitingUser.setFirstName(userDTO.getFirstName());
-        exisitingUser.setLastName(userDTO.getLastName());
-        exisitingUser.setAddress(userDTO.getAddress());
-        exisitingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userDTO.getFirstName() != null) {
+            exisitingUser.setFirstName(userDTO.getFirstName());
+        }
+        if (userDTO.getLastName() != null) {
+            exisitingUser.setLastName(userDTO.getLastName());
+        }
+        if (userDTO.getAddress() != null) {
+            exisitingUser.setAddress(userDTO.getAddress());
+        }
+        if (userDTO.getPhoneNumber() != null) {
+            exisitingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+        userRepository.save(exisitingUser);
+        return modelMapper.map(exisitingUser, UserResponse.class);
+    }
 
+    @Override
+    public UserResponse updateAvatarUser(Long userId, String avatarUrl, String avatarName) throws Exception {
+        User exisitingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find User with ID = " + userId));
+
+        if (exisitingUser.getAvatar() != null) {
+            String publicIdAvatar = exisitingUser.getAvatarName();
+            fileUploadService.removeFile(publicIdAvatar);
+        }
+        exisitingUser.setAvatar(avatarUrl);
+        exisitingUser.setAvatarName(avatarName);
         userRepository.save(exisitingUser);
         return modelMapper.map(exisitingUser, UserResponse.class);
     }
@@ -182,11 +206,11 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException {
+    public User blockOrEnable(Long userId) throws DataNotFoundException {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find User with ID = " + userId));
-        existingUser.setActive(active);
-        userRepository.save(existingUser);
+        existingUser.setActive(!existingUser.isActive());
+        return userRepository.save(existingUser);
     }
 
     private void sendEmailActive(String email, String activeCode) {
@@ -223,7 +247,7 @@ public class UserService implements IUserService {
                 "<h1 style=\"color: #333333;\">Timevo Website</h1>" +
                 "</div>" +
                 "<div style=\"margin-top: 20px;\">" +
-                    "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">Your password has been reset. Your new password for the Timevo account associated with this email (<strong>" + email + "</strong>) is:</p>" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">Your password has been reset. Your new password for the Timevo account associated with this email (<strong>" + email + "</strong>) is:</p>" +
                 "<p style=\"font-size: 20px; color: #ff5722; font-weight: bold; text-align: center;\">" + newPassword + "</p>" +
                 "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">Please change this password after logging in for security purposes.</p>" +
                 "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">If you did not request this change, please contact our support immediately.</p>" +
@@ -236,4 +260,13 @@ public class UserService implements IUserService {
                 "</html>";
         emailService.sendMessages("timevo.service@gmail.com", email, subject, text);
     }
+
+    @Override
+    public CloudinaryResponse uploadImage(MultipartFile file) throws Exception {
+        FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
+        String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
+        CloudinaryResponse response = fileUploadService.uploadFile(file, fileName);
+        return response;
+    }
+
 }

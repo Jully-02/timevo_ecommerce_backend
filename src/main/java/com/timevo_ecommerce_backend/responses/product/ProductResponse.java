@@ -35,6 +35,8 @@ public class ProductResponse {
 
     private Category category;
 
+    private String specification;
+
 //    private List<Color> colors;
 //
 //    @JsonProperty("material_names")

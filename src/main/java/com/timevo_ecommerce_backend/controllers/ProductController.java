@@ -15,8 +15,10 @@ import com.timevo_ecommerce_backend.responses.product.ProductImageResponse;
 import com.timevo_ecommerce_backend.responses.product.ProductListResponse;
 import com.timevo_ecommerce_backend.responses.product.ProductResponse;
 import com.timevo_ecommerce_backend.services.color.IColorService;
+import com.timevo_ecommerce_backend.services.file_upload.IFileUploadService;
 import com.timevo_ecommerce_backend.services.product.IProductRedisService;
 import com.timevo_ecommerce_backend.services.product.IProductService;
+import com.timevo_ecommerce_backend.services.product_image.IProductImageService;
 import com.timevo_ecommerce_backend.services.variant.IProductVariantService;
 import com.timevo_ecommerce_backend.utils.FileUploadUtil;
 import com.timevo_ecommerce_backend.utils.MessagesKey;
@@ -45,6 +47,8 @@ public class ProductController {
     private final IProductVariantService productVariantService;
     private final IColorService colorService;
     private final LocalizationUtils localizationUtils;
+    private final IProductImageService productImageService;
+    private final IFileUploadService fileUploadService;
     private final IProductRedisService productRedisService;
 
     @PostMapping("")
@@ -75,7 +79,7 @@ public class ProductController {
             );
     }
 
-    @PostMapping(value = "uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> uploadImages (
             @RequestParam("product-id") Long productId,
@@ -85,6 +89,17 @@ public class ProductController {
         try {
             ProductResponse existingProduct = productService.getProductById(productId);
             Color existingColor = colorService.getColorById(colorId);
+
+            List<ProductImage> existingProductImages = productImageService.findByProductIdAndColorId(productId, colorId);
+
+            if (!existingProductImages.isEmpty()) {
+                for (ProductImage productImage : existingProductImages) {
+                    String imageName = productImage.getImageName();
+                    fileUploadService.removeFile(imageName);
+                }
+                productImageService.deleteByProductIdAndColorId(productId, colorId);
+            }
+
             files = files == null ? new ArrayList<MultipartFile>() : files;
             if (files.size() > ProductImage.MAXIMUM_IMAGES_PER_COLOR_OF_PRODUCT) {
                 return ResponseEntity.badRequest().body("You can only upload maximum " + ProductImage.MAXIMUM_IMAGES_PER_COLOR_OF_PRODUCT + " images");
@@ -104,9 +119,6 @@ public class ProductController {
                     return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                             .body("File must be an image");
                 }
-                // Save file and update thumbnail in DTO
-//                String fileName = storeFile(file);
-//                String name = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
                 CloudinaryResponse cloudinaryResponse = productService.uploadImage(file);
                 ProductImageResponse productImage = productService.insertProductImage(
                         existingProduct.getId(),

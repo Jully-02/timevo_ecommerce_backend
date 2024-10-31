@@ -29,8 +29,14 @@ public class UserResponse {
 
     private String email;
 
+    private String address;
+
     @JsonProperty("date_of_birth")
     private Date dateOfBirth;
+
+    private String avatar;
+
+    private String avatarName;
 
     @JsonProperty("roles")
     private List<Role> roles;

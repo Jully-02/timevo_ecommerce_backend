@@ -45,6 +45,9 @@ public class Product extends BaseEntity{
     @Column(name = "quantity_stock")
     private int quantityStock;
 
+    @Column(name = "specification")
+    private String specification;
+
     @ManyToOne(cascade = {
             CascadeType.PERSIST, CascadeType.DETACH,
             CascadeType.REFRESH, CascadeType.MERGE

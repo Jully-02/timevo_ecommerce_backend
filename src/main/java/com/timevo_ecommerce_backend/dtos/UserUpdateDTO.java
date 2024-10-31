@@ -43,4 +43,8 @@ public class UserUpdateDTO {
     private Date dateOfBirth;
 
     private String address;
+
+    private String avatar;
+
+    private String avatarName;
 }

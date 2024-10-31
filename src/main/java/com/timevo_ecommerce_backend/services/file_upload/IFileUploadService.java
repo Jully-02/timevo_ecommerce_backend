@@ -5,4 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IFileUploadService {
     CloudinaryResponse uploadFile (MultipartFile multipartFile, String fileName) throws Exception;
+    boolean removeFile(String publicId) throws Exception;
 }

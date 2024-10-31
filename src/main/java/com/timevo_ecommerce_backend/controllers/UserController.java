@@ -9,9 +9,11 @@ import com.timevo_ecommerce_backend.entities.Token;
 import com.timevo_ecommerce_backend.entities.User;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.Response;
+import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
 import com.timevo_ecommerce_backend.responses.user.*;
 import com.timevo_ecommerce_backend.services.token.ITokenService;
 import com.timevo_ecommerce_backend.services.user.IUserService;
+import com.timevo_ecommerce_backend.utils.FileUploadUtil;
 import com.timevo_ecommerce_backend.utils.MessagesKey;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -21,12 +23,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -207,6 +211,48 @@ public class UserController {
         );
     }
 
+    @PutMapping(value = "/avatar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> updateAvatarUser (
+            @PathVariable("id") Long userId,
+            @ModelAttribute("file") MultipartFile file
+    ) throws Exception {
+        String avatarUrl = "";
+        String avatarName = "";
+        if (!file.isEmpty()) {
+            if (file.getSize() > FileUploadUtil.MAX_FILE_SIZE) {
+                return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                        .body("File is to large! Maximum size is 10MB");
+            }
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                        .body("File must be an image");
+            }
+            CloudinaryResponse cloudinaryResponse = userService.uploadImage(file);
+            avatarUrl = cloudinaryResponse.getUrl();
+            avatarName = cloudinaryResponse.getPublicId();
+        }
+        if (!avatarUrl.equals("") && !avatarName.equals("")) {
+            UserResponse userResponse = userService.updateAvatarUser(userId, avatarUrl, avatarName);
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .data(userResponse)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.UPDATE_SUCCESSFULLY))
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        }
+        else {
+            return ResponseEntity.badRequest().body(
+                    Response.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.UPDATE_FAILED))
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
+        }
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> updateUser(
@@ -288,14 +334,13 @@ public class UserController {
         );
     }
 
-    @PutMapping("/block/{user-id}/active")
+    @PutMapping("/block/{user-id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Response> blockOrEnable(
-            @PathVariable("user-id") Long userId,
-            @PathVariable("active") int active
+            @PathVariable("user-id") Long userId
     ) throws DataNotFoundException {
-        userService.blockOrEnable(userId, active > 0);
-        String message = active > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
+        User user = userService.blockOrEnable(userId);
+        String message = user.isActive() ? "Successfully enabled the user." : "Successfully blocked the user.";
         return ResponseEntity.ok(
                 Response.builder()
                         .message(message)

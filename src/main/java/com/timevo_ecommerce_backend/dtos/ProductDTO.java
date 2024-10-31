@@ -45,6 +45,8 @@ public class ProductDTO {
     @Min(value = 1, message = "Category ID must be greater than or equal to 1")
     private long categoryId;
 
+    private String specification;
+
 //    @NotNull(message = "Color ID are required")
 //    @JsonProperty("color_ids")
 //    @Size(min = 1, message = "There must be at least one Color ID")

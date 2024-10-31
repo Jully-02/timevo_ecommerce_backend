@@ -51,6 +51,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
+    @Column(name = "avatar")
+    private String avatar;
+
+    @Column(name = "avatar_name")
+    private String avatarName;
+
     @OneToMany(mappedBy = "user",
             fetch = FetchType.LAZY,
             cascade = {

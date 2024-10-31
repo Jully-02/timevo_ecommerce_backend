@@ -174,6 +174,7 @@ public class ProductService implements IProductService {
             existingProduct.setAverageRate(productDTO.getAverageRate());
             existingProduct.setQuantityStock(productDTO.getQuantityStock());
             existingProduct.setCategory(existingCategory);
+            existingProduct.setSpecification(productDTO.getSpecification());
             if (collections.isEmpty()) {
                 existingProduct.setCollections(collections);
             }
