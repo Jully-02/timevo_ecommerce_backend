@@ -38,6 +38,9 @@ public class UserResponse {
 
     private String avatarName;
 
+    @JsonProperty("is_active")
+    private boolean isActive;
+
     @JsonProperty("roles")
     private List<Role> roles;
 }
