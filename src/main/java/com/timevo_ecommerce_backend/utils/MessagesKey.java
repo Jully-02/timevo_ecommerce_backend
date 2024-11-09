@@ -16,8 +16,14 @@ public class MessagesKey {
     public static final String INSERT_FAILED = "insert.insert_failed";
     public static final String UPDATE_SUCCESSFULLY = "update.update_successfully";
     public static final String UPDATE_FAILED = "update.update_failed";
+
     public static final String DELETE_SUCCESSFULLY = "delete.delete_successfully";
     public static final String DELETE_FAILED = "delete.delete_failed";
-
     public static final String RESET_SUCCESSFULLY = "user.reset_password.successfully";
+    public static final String OTP_SUCCESSFULLY = "user.generate-otp.successfully";
+    public static final String OTP_FAILED = "user.generate-otp.failed";
+    public static final String CHECK_OTP_SUCCESSFULLY = "user.check-otp.successfully";
+    public static final String CHECK_OTP_FAILED = "user.check-otp.failed";
+    public static final String CHANGE_PASSWORD_SUCCESSFULLY = "user.change-password.successfully";
+    public static final String CHANGE_PASSWORD_FAILED = "user.change-password.failed";
 }

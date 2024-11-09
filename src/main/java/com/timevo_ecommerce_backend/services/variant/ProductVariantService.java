@@ -129,6 +129,7 @@ public class ProductVariantService implements IProductVariantService {
     }
 
     @Override
+    @Transactional
     public void deleteVariantByProductId(Long productId) {
         productVariantRepository.deleteByProductId(productId);
     }

@@ -2,6 +2,7 @@ package com.timevo_ecommerce_backend.services.user;
 
 import com.timevo_ecommerce_backend.components.JwtTokenUtil;
 import com.timevo_ecommerce_backend.dtos.UserDTO;
+import com.timevo_ecommerce_backend.dtos.UserActionPasswordDTO;
 import com.timevo_ecommerce_backend.dtos.UserUpdateDTO;
 import com.timevo_ecommerce_backend.entities.Role;
 import com.timevo_ecommerce_backend.entities.Token;
@@ -29,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 @Service
@@ -206,12 +208,109 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
+    public void generateOTP(String email) throws DataNotFoundException {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find User with Email = " + email));
+        if (existingUser.getOtp() != null) {
+            existingUser.setOtp(null);
+        }
+        else {
+            SecureRandom random = new SecureRandom();
+            int otp = 100000 + random.nextInt(900000);
+            existingUser.setOtp(String.valueOf(otp));
+            sendEmailForgotPassword(existingUser.getEmail(), String.valueOf(otp));
+        }
+        userRepository.save(existingUser);
+    }
+
+    @Override
+    @Transactional
+    public boolean changePassword (UserActionPasswordDTO userActionPasswordDTO) throws Exception {
+        User user = userRepository.findByEmail(userActionPasswordDTO.getEmail())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find User with Email = " + userActionPasswordDTO.getEmail()));
+        if (passwordEncoder.matches(userActionPasswordDTO.getOldPassword(), user.getPassword())) {
+            if (userActionPasswordDTO.getPassword().equals(userActionPasswordDTO.getRetypePassword())) {
+                String encodedNewPassword = passwordEncoder.encode(userActionPasswordDTO.getPassword());
+                user.setPassword(encodedNewPassword);
+                userRepository.save(user);
+                List<Token> tokens = tokenRepository.findByUser(user);
+                for (Token tokenItem : tokens) {
+                    tokenRepository.delete(tokenItem);
+                }
+                sendEmailPasswordChanged(user.getEmail());
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional
+    public boolean checkOTP (String email, String OTP) throws DataNotFoundException {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find User with Email = " + email));
+        if (existingUser.getOtp().equals(OTP)) {
+            existingUser.setOtp(null);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional
+    public boolean forgotPassword(UserActionPasswordDTO userForgotPasswordDTO) throws DataNotFoundException {
+        User existingUser = userRepository.findByEmail(userForgotPasswordDTO.getEmail())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find User with Email = " + userForgotPasswordDTO.getEmail()));
+        if (userForgotPasswordDTO.getPassword().equals(userForgotPasswordDTO.getRetypePassword())) {
+            String encodedPassword = passwordEncoder.encode(userForgotPasswordDTO.getPassword());
+            existingUser.setPassword(encodedPassword);
+            userRepository.save(existingUser);
+            List<Token> tokens = tokenRepository.findByUser(existingUser);
+            for (Token token : tokens) {
+                tokenRepository.delete(token);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+
+    @Override
+    @Transactional
     public User blockOrEnable(Long userId) throws DataNotFoundException {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find User with ID = " + userId));
         existingUser.setActive(!existingUser.isActive());
         return userRepository.save(existingUser);
     }
+
+    private void sendEmailPasswordChanged(String email) {
+        String subject = "Your Password Has Been Successfully Changed";
+        String text = "<!DOCTYPE html>" +
+                "<html>" +
+                "<body style=\"font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;\">" +
+                "<div style=\"max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\">" +
+                "<div style=\"text-align: center; padding-bottom: 20px; border-bottom: 1px solid #dddddd;\">" +
+                "<h1 style=\"color: #333333;\">Timevo Website</h1>" +
+                "</div>" +
+                "<div style=\"margin-top: 20px;\">" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">Hello,</p>" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">This is a confirmation that your password has been successfully changed.</p>" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">If you did not make this change, please contact our support team immediately to secure your account.</p>" +
+                "</div>" +
+                "<div style=\"margin-top: 30px; padding-top: 20px; border-top: 1px solid #dddddd; text-align: center; font-size: 14px; color: #aaaaaa;\">" +
+                "<p>&copy; 2024 Timevo. All rights reserved.</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+        emailService.sendMessages("timevo.service@gmail.com", email, subject, text);
+    }
+
 
     private void sendEmailActive(String email, String activeCode) {
         String subject = "Confirm customer account at Timevo Website";
@@ -261,6 +360,32 @@ public class UserService implements IUserService {
         emailService.sendMessages("timevo.service@gmail.com", email, subject, text);
     }
 
+    private void sendEmailForgotPassword(String email, String otpCode) {
+        String subject = "Your OTP Code for Password Forgot - Timevo Website";
+        String text = "<!DOCTYPE html>" +
+                "<html>" +
+                "<body style=\"font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;\">" +
+                "<div style=\"max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\">" +
+                "<div style=\"text-align: center; padding-bottom: 20px; border-bottom: 1px solid #dddddd;\">" +
+                "<h1 style=\"color: #333333;\">Timevo Website</h1>" +
+                "</div>" +
+                "<div style=\"margin-top: 20px;\">" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">You have requested a password forgot for your Timevo account associated with this email (<strong>" + email + "</strong>).</p>" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">Your OTP code is:</p>" +
+                "<p style=\"font-size: 24px; color: #ff5722; font-weight: bold; text-align: center;\">" + otpCode + "</p>" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">This code is valid for <strong>1 minute</strong>. Please use it promptly to reset your password.</p>" +
+                "<p style=\"font-size: 16px; line-height: 1.6; color: #666666;\">If you did not request this change, please contact our support team immediately.</p>" +
+                "</div>" +
+                "<div style=\"margin-top: 30px; padding-top: 20px; border-top: 1px solid #dddddd; text-align: center; font-size: 14px; color: #aaaaaa;\">" +
+                "<p>&copy; 2024 Timevo. All rights reserved.</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+        emailService.sendMessages("timevo.service@gmail.com", email, subject, text);
+    }
+
+
     @Override
     public CloudinaryResponse uploadImage(MultipartFile file) throws Exception {
         FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
@@ -268,5 +393,6 @@ public class UserService implements IUserService {
         CloudinaryResponse response = fileUploadService.uploadFile(file, fileName);
         return response;
     }
+
 
 }

@@ -42,6 +42,9 @@ public class WebSecurityConfig {
                                     String.format("%s/users/details", apiPrefix),
                                     String.format("%s/users/email-unique", apiPrefix),
                                     String.format("%s/users/active-account", apiPrefix),
+                                    String.format("%s/users/generate-otp", apiPrefix),
+                                    String.format("%s/users/check-otp", apiPrefix),
+                                    String.format("%s/users/forgot-password", apiPrefix),
 
                                     //swagger
                                     //"/v3/api-docs",

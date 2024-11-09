@@ -1,10 +1,7 @@
 package com.timevo_ecommerce_backend.controllers;
 
 import com.timevo_ecommerce_backend.components.LocalizationUtils;
-import com.timevo_ecommerce_backend.dtos.RefreshTokenDTO;
-import com.timevo_ecommerce_backend.dtos.UserDTO;
-import com.timevo_ecommerce_backend.dtos.UserLoginDTO;
-import com.timevo_ecommerce_backend.dtos.UserUpdateDTO;
+import com.timevo_ecommerce_backend.dtos.*;
 import com.timevo_ecommerce_backend.entities.Token;
 import com.timevo_ecommerce_backend.entities.User;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
@@ -165,7 +162,7 @@ public class UserController {
     }
 
     @GetMapping("/email-unique")
-    public ResponseEntity<Response> emailUnique (@RequestParam("email") String email) {
+    public ResponseEntity<Response> emailUnique(@RequestParam("email") String email) {
         boolean isUnique = userService.emailUnique(email);
         if (!isUnique) {
             return ResponseEntity.ok(
@@ -213,7 +210,7 @@ public class UserController {
 
     @PutMapping(value = "/avatar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> updateAvatarUser (
+    public ResponseEntity<?> updateAvatarUser(
             @PathVariable("id") Long userId,
             @ModelAttribute("file") MultipartFile file
     ) throws Exception {
@@ -242,8 +239,7 @@ public class UserController {
                             .status(HttpStatus.OK)
                             .build()
             );
-        }
-        else {
+        } else {
             return ResponseEntity.badRequest().body(
                     Response.builder()
                             .message(localizationUtils.getLocalizedMessage(MessagesKey.UPDATE_FAILED))
@@ -310,6 +306,41 @@ public class UserController {
         );
     }
 
+    @PutMapping("/change-password")
+    public ResponseEntity<Response> changePassword (
+            @Valid @RequestBody UserActionPasswordDTO userActionPasswordDTO,
+            BindingResult result
+    ) throws Exception {
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList();
+            return ResponseEntity.badRequest().body(
+                    Response.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.INVALID_ERROR, errorMessages.toString()))
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build()
+            );
+        }
+        boolean isChange = userService.changePassword(userActionPasswordDTO);
+        if (isChange) {
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .data(true)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.CHANGE_PASSWORD_SUCCESSFULLY))
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        }
+        return ResponseEntity.badRequest().body(
+                Response.builder()
+                        .data(false)
+                        .message(localizationUtils.getLocalizedMessage(MessagesKey.CHANGE_PASSWORD_FAILED))
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
+    }
+
     @PutMapping("/reset-password/{user-id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<Response> resetPassword(
@@ -330,6 +361,78 @@ public class UserController {
                         .data(newPassword)
                         .message(localizationUtils.getLocalizedMessage(MessagesKey.RESET_SUCCESSFULLY))
                         .status(HttpStatus.OK)
+                        .build()
+        );
+    }
+
+    @PutMapping("/generate-otp")
+    public ResponseEntity<Response> generateOTP(
+            @RequestParam("email") String email
+    ) throws DataNotFoundException {
+        userService.generateOTP(email);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .message(localizationUtils.getLocalizedMessage(MessagesKey.OTP_SUCCESSFULLY))
+                        .status(HttpStatus.OK)
+                        .build()
+        );
+    }
+
+    @PutMapping("/check-otp")
+    public ResponseEntity<Response> checkOTP(
+            @RequestParam("email") String email,
+            @RequestParam("otp") String otp
+    ) throws DataNotFoundException {
+        boolean isCheck = userService.checkOTP(email, otp);
+        if (isCheck) {
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .data(true)
+                            .status(HttpStatus.OK)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.CHECK_OTP_SUCCESSFULLY))
+                            .build()
+            );
+        }
+        return ResponseEntity.badRequest().body(
+                Response.builder()
+                        .data(false)
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(localizationUtils.getLocalizedMessage(MessagesKey.CHECK_OTP_FAILED))
+                        .build()
+        );
+    }
+
+    @PutMapping("/forgot-password")
+    public ResponseEntity<Response> forgotPassword(
+            @Valid @RequestBody UserActionPasswordDTO userActionPasswordDTO,
+            BindingResult result
+    ) throws DataNotFoundException {
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList();
+            return ResponseEntity.badRequest().body(
+                    Response.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.INVALID_ERROR, errorMessages.toString()))
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build()
+            );
+        }
+        boolean isUpdate = userService.forgotPassword(userActionPasswordDTO);
+        if (isUpdate) {
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .data(true)
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.UPDATE_SUCCESSFULLY))
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        }
+        return ResponseEntity.badRequest().body(
+                Response.builder()
+                        .data(false)
+                        .message(localizationUtils.getLocalizedMessage(MessagesKey.UPDATE_FAILED))
+                        .status(HttpStatus.BAD_REQUEST)
                         .build()
         );
     }
