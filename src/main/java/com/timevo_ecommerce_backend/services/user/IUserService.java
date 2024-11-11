@@ -36,7 +36,7 @@ public interface IUserService {
 
     CloudinaryResponse uploadImage(MultipartFile file) throws Exception;
 
-     void generateOTP (String email) throws DataNotFoundException;
+     int generateOTP (String email) throws DataNotFoundException;
 
      boolean checkOTP (String email, String OTP) throws DataNotFoundException;
 

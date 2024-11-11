@@ -208,19 +208,22 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public void generateOTP(String email) throws DataNotFoundException {
+    public int generateOTP(String email) throws DataNotFoundException {
         User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find User with Email = " + email));
         if (existingUser.getOtp() != null) {
             existingUser.setOtp(null);
+            userRepository.save(existingUser);
+            return 1;
         }
         else {
             SecureRandom random = new SecureRandom();
             int otp = 100000 + random.nextInt(900000);
             existingUser.setOtp(String.valueOf(otp));
             sendEmailForgotPassword(existingUser.getEmail(), String.valueOf(otp));
+            userRepository.save(existingUser);
+            return 2;
         }
-        userRepository.save(existingUser);
     }
 
     @Override

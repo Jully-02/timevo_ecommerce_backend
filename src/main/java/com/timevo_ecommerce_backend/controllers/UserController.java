@@ -369,13 +369,23 @@ public class UserController {
     public ResponseEntity<Response> generateOTP(
             @RequestParam("email") String email
     ) throws DataNotFoundException {
-        userService.generateOTP(email);
-        return ResponseEntity.ok(
-                Response.builder()
-                        .message(localizationUtils.getLocalizedMessage(MessagesKey.OTP_SUCCESSFULLY))
-                        .status(HttpStatus.OK)
-                        .build()
-        );
+        int isGenerateOTP = userService.generateOTP(email);
+        if (isGenerateOTP == 2) {
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.OTP_SUCCESSFULLY))
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        }
+        else  {
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessagesKey.DELETE_OTP_SUCCESSFULLY))
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        }
     }
 
     @PutMapping("/check-otp")

@@ -26,4 +26,6 @@ public class MessagesKey {
     public static final String CHECK_OTP_FAILED = "user.check-otp.failed";
     public static final String CHANGE_PASSWORD_SUCCESSFULLY = "user.change-password.successfully";
     public static final String CHANGE_PASSWORD_FAILED = "user.change-password.failed";
+    public static final String DELETE_OTP_SUCCESSFULLY = "user.delete-otp.successfully";
+    public static final String DELETE_OTP_FAILED = "user.delete-otp.failed";
 }
