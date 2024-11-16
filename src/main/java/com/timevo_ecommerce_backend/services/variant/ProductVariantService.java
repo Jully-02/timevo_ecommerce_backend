@@ -7,6 +7,7 @@ import com.timevo_ecommerce_backend.exceptions.ExistDataException;
 import com.timevo_ecommerce_backend.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ProductVariantService implements IProductVariantService {
     @Override
     public List<ProductVariant> insertVariant(List<ProductVariantDTO> productVariantDTOs) throws ExistDataException, DataNotFoundException {
         List<ProductVariant> variants = new ArrayList<>();
-        for ( ProductVariantDTO productVariantDTO : productVariantDTOs) {
+        for (ProductVariantDTO productVariantDTO : productVariantDTOs) {
             if (productVariantRepository.existsByProductIdAndColorIdAndMaterialIdAndScreenSizeId(
                     productVariantDTO.getProductId(),
                     productVariantDTO.getColorId(),
@@ -131,6 +132,6 @@ public class ProductVariantService implements IProductVariantService {
     @Override
     @Transactional
     public void deleteVariantByProductId(Long productId) {
-        productVariantRepository.deleteByProductId(productId);
+        productVariantRepository.deleteProductVariantByProductId(productId);
     }
 }

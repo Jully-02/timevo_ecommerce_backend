@@ -2,6 +2,7 @@ package com.timevo_ecommerce_backend.repositories;
 
 import com.timevo_ecommerce_backend.entities.ProductVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,8 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     List<ProductVariant> findByProductIdAndColorId (Long productId, Long colorId);
 
     void deleteByProductId(Long productId);
+
+    @Modifying
+    @Query("DELETE FROM ProductVariant pv WHERE pv.product.id = :productId")
+    void deleteProductVariantByProductId (Long productId);
 }
