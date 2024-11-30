@@ -194,4 +194,44 @@ public class FeedbackController {
         );
     }
 
+    @GetMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> getFeedbacks (
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "limit", defaultValue = "16") int limit,
+            @RequestParam(value = "sort", defaultValue = "latest") String sortOption
+    ) {
+        Sort sort = switch (sortOption) {
+            case "high" -> Sort.by("rate").descending();
+            case "low" -> Sort.by("rate").ascending();
+            case "latest" -> Sort.by("createdAt").descending();
+            case "oldest" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("id").ascending();
+        };
+        PageRequest pageRequest = PageRequest.of(
+                page, limit, sort
+        );
+        Page<Feedback> feedbackPage = feedbackService.getFeedbacks(pageRequest);
+        List<FeedbackResponse> feedbackResponses = feedbackPage.getContent().stream()
+                .map(feedback -> {
+                    FeedbackResponse feedbackResponse = modelMapper.map(feedback, FeedbackResponse.class);
+                    feedbackResponse.setUserId(feedback.getUser().getId());
+                    feedbackResponse.setProductId(feedback.getProduct().getId());
+                    feedbackResponse.setFirstName(feedback.getUser().getFirstName());
+                    feedbackResponse.setLastName(feedback.getUser().getLastName());
+                    return feedbackResponse;
+                }).toList();
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(FeedbackListResponse.builder()
+                                .feedbackResponses(feedbackResponses)
+                                .totalPages(feedbackPage.getTotalPages())
+                                .totalFeedbacks(feedbackService.totalFeedbacks())
+                                .build()
+                        )
+                        .message("Get feedbacks successfully")
+                        .status(HttpStatus.OK)
+                        .build()
+        );
+    }
 }

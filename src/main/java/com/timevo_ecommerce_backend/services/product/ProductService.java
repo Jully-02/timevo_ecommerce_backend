@@ -295,6 +295,36 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public List<ProductResponse> getProductsByPriceRange (float minPrice, float maxPrice) {
+        List<Product> products = productRepository.getProductsByPriceRange(minPrice, maxPrice);
+        return products.stream()
+                .map(product -> {
+                    ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+                    List<ProductVariantResponse> variantResponses = new ArrayList<>();
+                    product.getProductVariants().forEach(
+                            variant -> variantResponses.add(modelMapper.map(variant, ProductVariantResponse.class))
+                    );
+                    productResponse.setVariants(variantResponses);
+                    if (product.getProductImages() != null) {
+                        productResponse.setProductImages(
+                                product.getProductImages().stream()
+                                        .map(productImage -> {
+                                            return ProductImageResponse.builder()
+                                                    .id(productImage.getId())
+                                                    .productId(productImage.getProduct().getId())
+                                                    .colorId(productImage.getColor().getId())
+                                                    .isMainImage(productImage.isMainImage())
+                                                    .imageName(productImage.getImageName())
+                                                    .imageUrl(productImage.getImageUrl())
+                                                    .build();
+                                        }).toList()
+                        );
+                    }
+                    return productResponse;
+                }).toList();
+    }
+
+    @Override
     public CloudinaryResponse uploadImage(MultipartFile file) throws Exception {
         FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
         String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());

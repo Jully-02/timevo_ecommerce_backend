@@ -98,6 +98,16 @@ public class FeedbackService implements IFeedbackService {
     }
 
     @Override
+    public Page<Feedback> getFeedbacks(Pageable pageable) {
+        return feedbackRepository.findAll(pageable);
+    }
+
+    @Override
+    public long totalFeedbacks() {
+        return feedbackRepository.count();
+    }
+
+    @Override
     public long countByUserId (Long userId) {
         return feedbackRepository.countByUserId(userId);
     }

@@ -46,5 +46,6 @@ public interface IProductService {
 
     List<ProductResponse> getProductsByIds (List<Long> productIds);
 
+    List<ProductResponse> getProductsByPriceRange (float minPrice, float maxPrice);
     CloudinaryResponse uploadImage (MultipartFile file) throws Exception;
 }

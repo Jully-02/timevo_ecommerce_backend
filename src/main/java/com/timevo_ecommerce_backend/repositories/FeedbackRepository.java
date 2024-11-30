@@ -13,6 +13,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     Page<Feedback> findByUserId (Long userId, Pageable pageable);
 
     Page<Feedback> findByProductId (Long productId, Pageable pageable);
+    Page<Feedback> findAll(Pageable pageable);
 
     long countByUserId (Long userId);
 

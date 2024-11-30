@@ -157,6 +157,7 @@ public class OrderService implements IOrderService{
         existingOrder.setShippingAddress(orderDTO.getShippingAddress());
         existingOrder.setPaymentStatus(orderDTO.isPaymentStatus());
         existingOrder.setSubTotal(orderDTO.getSubTotal());
+        existingOrder.setStatus(orderDTO.getStatus());
         if (existingOrder.getUser().getId() != orderDTO.getUserId()) {
             User exisitngUser = userRepository.findById(orderDTO.getUserId())
                     .orElseThrow(() -> new DataNotFoundException("Cannot find User with ID = " + orderDTO.getUserId()));

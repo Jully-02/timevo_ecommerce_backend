@@ -19,6 +19,10 @@ public interface IFeedbackService {
 
     Page<Feedback> getFeedBackByUserId (long userId, Pageable pageable);
 
+    Page<Feedback> getFeedbacks (Pageable pageable);
+
+    long totalFeedbacks ();
+
     void deleteFeedBackById (long id);
 
     long countByUserId (Long userId);

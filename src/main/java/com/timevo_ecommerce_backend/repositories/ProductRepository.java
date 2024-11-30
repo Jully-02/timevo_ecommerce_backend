@@ -49,4 +49,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p FROM Product p WHERE p.id IN :productIds")
     List<Product> getProductsByIds (@Param("productIds") List<Long> productIds);
+
+    @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice")
+    List<Product> getProductsByPriceRange(@Param("minPrice") float minPrice, @Param("maxPrice") float maxPrice);
+
 }

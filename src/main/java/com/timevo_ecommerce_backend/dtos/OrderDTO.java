@@ -1,6 +1,7 @@
 package com.timevo_ecommerce_backend.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.timevo_ecommerce_backend.entities.OrderStatus;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,8 @@ public class OrderDTO {
             message = "Phone number must be valid"
     )
     private String phoneNumber;
+
+    private OrderStatus status;
 
     private String address;
 

@@ -121,6 +121,8 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/products/*", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/products/filter-price**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
                                     String.format("%s/products/get-products**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/products/images/*", apiPrefix)).permitAll()
