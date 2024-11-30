@@ -148,7 +148,9 @@ public class ProductController {
             @RequestParam(defaultValue = "", name = "collection-ids") String collectionIds,
             @RequestParam(defaultValue = "default", name ="sort") String sortOption,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int limit
+            @RequestParam(defaultValue = "16") int limit,
+            @RequestParam(name = "min-price") Float minPrice,
+            @RequestParam(name = "max-price") Float maxPrice
     ) throws JsonProcessingException {
         Sort sort = switch (sortOption) {
             case "popularity" -> Sort.by("id").descending();
@@ -220,6 +222,8 @@ public class ProductController {
                 materials, materials == null ? 0 : materials.size(),
                 screenSizes, screenSizes == null ? 0 : screenSizes.size(),
                 keyword,
+                minPrice,
+                maxPrice,
                 pageRequest);
         int totalPages = productPage.getTotalPages();
         List<ProductResponse> productResponses = productPage.getContent();
@@ -244,21 +248,6 @@ public class ProductController {
                         .data(productResponse)
                         .status(HttpStatus.OK)
                         .message("Get product successfully")
-                        .build()
-        );
-    }
-
-    @GetMapping("/filter-price")
-    public ResponseEntity<Response> getProductsByPriceRange (
-            @RequestParam("min-price") float minPrice,
-            @RequestParam("max-price") float maxPrice)
-    {
-        List<ProductResponse> productResponses = productService.getProductsByPriceRange(minPrice, maxPrice);
-        return ResponseEntity.ok(
-                Response.builder()
-                        .data(productResponses)
-                        .status(HttpStatus.OK)
-                        .message("Get products successfully")
                         .build()
         );
     }

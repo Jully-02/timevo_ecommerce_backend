@@ -26,6 +26,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "AND (:screenSizeIds IS NULL OR ss.id IN :screenSizeIds) " +
             "AND (:materialIds IS NULL OR m.id IN :materialIds) " +
             "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword% OR p.description LIKE %:keyword%) " +
+            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
             "GROUP BY p.id " +
             "HAVING (:categoryIds IS NULL OR COUNT(DISTINCT p.category.id) = :categoryCount) " +
             "AND (:collectionIds IS NULL OR COUNT(DISTINCT col.id) = :collectionCount) " +
@@ -44,6 +46,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("screenSizeIds") List<Long> screenSizeIds,
             @Param("screenSizeCount") long screenSizeCount,
             @Param("keyword") String keyword,
+            @Param("minPrice") Float minPrice,
+            @Param("maxPrice") Float maxPrice,
             Pageable pageable
     );
 

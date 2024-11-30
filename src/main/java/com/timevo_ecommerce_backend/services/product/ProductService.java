@@ -120,9 +120,9 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<ProductResponse> searchProducts(List<Long> categoryIds, long categoryCount, List<Long> collectionIds, long collectionCount, List<Long> colorIds, long colorCount, List<Long> materialIds, long materialCount, List<Long> screenSizeIds, long screenSizeCount, String keyword, PageRequest pageRequest) {
+    public Page<ProductResponse> searchProducts(List<Long> categoryIds, long categoryCount, List<Long> collectionIds, long collectionCount, List<Long> colorIds, long colorCount, List<Long> materialIds, long materialCount, List<Long> screenSizeIds, long screenSizeCount, String keyword, Float minPrice, Float maxPrice, PageRequest pageRequest) {
         Page<Product> productPage;
-        productPage = productRepository.searchProducts(categoryIds, categoryCount, collectionIds, collectionCount, colorIds, colorCount, materialIds, materialCount, screenSizeIds, screenSizeCount, keyword, pageRequest);
+        productPage = productRepository.searchProducts(categoryIds, categoryCount, collectionIds, collectionCount, colorIds, colorCount, materialIds, materialCount, screenSizeIds, screenSizeCount, keyword, minPrice, maxPrice, pageRequest);
 
         return productPage.map(
                 product -> {
@@ -267,36 +267,6 @@ public class ProductService implements IProductService {
     @Override
     public List<ProductResponse> getProductsByIds(List<Long> productIds) {
         List<Product> products = productRepository.getProductsByIds(productIds);
-        return products.stream()
-                .map(product -> {
-                    ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
-                    List<ProductVariantResponse> variantResponses = new ArrayList<>();
-                    product.getProductVariants().forEach(
-                            variant -> variantResponses.add(modelMapper.map(variant, ProductVariantResponse.class))
-                    );
-                    productResponse.setVariants(variantResponses);
-                    if (product.getProductImages() != null) {
-                        productResponse.setProductImages(
-                                product.getProductImages().stream()
-                                        .map(productImage -> {
-                                            return ProductImageResponse.builder()
-                                                    .id(productImage.getId())
-                                                    .productId(productImage.getProduct().getId())
-                                                    .colorId(productImage.getColor().getId())
-                                                    .isMainImage(productImage.isMainImage())
-                                                    .imageName(productImage.getImageName())
-                                                    .imageUrl(productImage.getImageUrl())
-                                                    .build();
-                                        }).toList()
-                        );
-                    }
-                    return productResponse;
-                }).toList();
-    }
-
-    @Override
-    public List<ProductResponse> getProductsByPriceRange (float minPrice, float maxPrice) {
-        List<Product> products = productRepository.getProductsByPriceRange(minPrice, maxPrice);
         return products.stream()
                 .map(product -> {
                     ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
