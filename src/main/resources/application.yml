@@ -41,6 +41,8 @@ spring:
     locations: classpath:/db/migration,classpath:/dev/db/migration
     baseline-on-migrate: true
     baseline-version: 0
+  # Security Oauth
+
 api:
   prefix: /api/v1
 jwt:

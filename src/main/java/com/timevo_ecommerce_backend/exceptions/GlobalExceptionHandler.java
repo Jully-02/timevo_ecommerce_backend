@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Response> handleGeneralException (Exception e) {
-        return ResponseEntity.internalServerError().body(
-                Response.builder()
-                        .message(e.getMessage())
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .build()
-        );
-    }
+    public class GlobalExceptionHandler {
+        @ExceptionHandler(Exception.class)
+        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        public ResponseEntity<Response> handleGeneralException (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    Response.builder()
+                            .message(e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
+        }
 
     @ExceptionHandler(DataNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -57,6 +57,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "avatar_name")
     private String avatarName;
 
+    @Column(name = "google_account_id")
+    private String googleAccountId;
+
+    @Column(name = "facebook_account_id")
+    private String facebookAccountId;
+
     @OneToMany(mappedBy = "user",
             fetch = FetchType.LAZY,
             cascade = {

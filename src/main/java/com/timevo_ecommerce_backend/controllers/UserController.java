@@ -8,6 +8,7 @@ import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
 import com.timevo_ecommerce_backend.responses.Response;
 import com.timevo_ecommerce_backend.responses.cloudinary.CloudinaryResponse;
 import com.timevo_ecommerce_backend.responses.user.*;
+import com.timevo_ecommerce_backend.services.auth.IAuthService;
 import com.timevo_ecommerce_backend.services.token.ITokenService;
 import com.timevo_ecommerce_backend.services.user.IUserService;
 import com.timevo_ecommerce_backend.utils.FileUploadUtil;
@@ -31,6 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("${api.prefix}/users")
@@ -41,11 +44,91 @@ public class UserController {
     private final ITokenService tokenService;
     private final LocalizationUtils localizationUtils;
     private final ModelMapper modelMapper;
+    private final IAuthService authService;
     private static final String UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String DIGITS = "0123456789";
     private static final String SPECIAL_CHARACTERS = "@$!%*?&";
     private static final SecureRandom RANDOM = new SecureRandom();
+
+    @GetMapping("/auth/social-login")
+    public ResponseEntity<String> socialAuth (
+            @RequestParam("login_type") String loginType,
+            HttpServletRequest request
+    ) {
+//        request.getRequestURI();
+        loginType = loginType.trim().toLowerCase();
+        String url = authService.generateAuthUrl(loginType);
+        return ResponseEntity.ok(url);
+    }
+
+    @GetMapping("/auth/social/callback")
+    public ResponseEntity<LoginResponse> callback (
+            @RequestParam("code") String code,
+            @RequestParam("login_type") String loginType,
+            HttpServletRequest request
+    ) throws  Exception {
+        // Call the AuthService to get user info
+        Map<String, Object> userInfo = authService.authenticateAndFetchProfile(code, loginType);
+
+        if (userInfo == null) {
+            return ResponseEntity.badRequest().body(LoginResponse
+                    .builder()
+                    .messages("Failed to authenticate")
+                    .build());
+        }
+
+        String accountId = "";
+        String name = "";
+        String firstName = "";
+        String lastName = "";
+        String email = "";
+        String avatar = "";
+
+        if (loginType.trim().equals("google")) {
+            accountId = (String) Objects.requireNonNullElse(userInfo.get("sub"), "");
+            name = (String) Objects.requireNonNullElse(userInfo.get("name"), "");
+            firstName = (String) Objects.requireNonNullElse(userInfo.get("given_name"), "");
+            lastName = (String) Objects.requireNonNullElse(userInfo.get("family_name"), "");
+            email = (String) Objects.requireNonNullElse(userInfo.get("email"), "");
+            avatar = (String) Objects.requireNonNullElse(userInfo.get("picture"), "");
+        } else if (loginType.trim().equals("facebook")) {
+            accountId = (String) Objects.requireNonNullElse(userInfo.get("id"), "");
+            name = (String) Objects.requireNonNullElse(userInfo.get("name"), "");
+            email = (String) Objects.requireNonNullElse(userInfo.get("email"), "");
+            Object pictureObj = userInfo.get("picture");
+            if (pictureObj instanceof Map) {
+                Map<?, ?> pictureData = (Map<?, ?>) pictureObj;
+                Object dataObj = pictureData.get("data");
+                if (dataObj instanceof Map) {
+                    Map<?, ?> dataMap = (Map<?, ?>) dataObj;
+                    Object urlObj = dataMap.get("url");
+                    if (urlObj instanceof String) {
+                        avatar = (String) urlObj;
+                    }
+                }
+            }
+        }
+
+        // Create UserDTO
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .email(email)
+                .password("")
+                .avatar(avatar)
+                .name(name)
+                .firstName(firstName)
+                .lastName(lastName)
+                .build();
+
+        if (loginType.trim().equals("google")) {
+            userLoginDTO.setGoogleAccountId(accountId);
+        }
+        else if (loginType.trim().equals("facebook")) {
+            userLoginDTO.setFacebookAccountId(accountId);
+        }
+
+        return loginSocial(userLoginDTO, request);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<Response> insertUser(
@@ -460,5 +543,31 @@ public class UserController {
                         .status(HttpStatus.OK)
                         .build()
         );
+    }
+
+    private ResponseEntity<LoginResponse> loginSocial (
+            @Valid @RequestBody UserLoginDTO userLoginDTO,
+            HttpServletRequest request
+    ) throws Exception {
+        String token = userService.loginSocial(userLoginDTO);
+
+        String userAgent = request.getHeader("User-Agent");
+        User userDetail = userService.getUserDetailsFromToken(token);
+        Token jwtToken = tokenService.addToken(userDetail, token, isMobileDevice(userAgent));
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .messages(localizationUtils.getLocalizedMessage(MessagesKey.LOGIN_SUCCESSFULLY))
+                .token(token)
+                .tokenType(jwtToken.getTokenType())
+                .refreshToken(jwtToken.getRefreshToken())
+                .username(userDetail.getUsername())
+                .roles(userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .id(userDetail.getId())
+                .build();
+        return ResponseEntity.ok(loginResponse);
+    }
+
+    private boolean isMobileDevice(String userAgent) {
+        return userAgent.toLowerCase().contains("mobile");
     }
 }

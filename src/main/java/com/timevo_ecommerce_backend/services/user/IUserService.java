@@ -2,6 +2,7 @@ package com.timevo_ecommerce_backend.services.user;
 
 import com.timevo_ecommerce_backend.dtos.UserDTO;
 import com.timevo_ecommerce_backend.dtos.UserActionPasswordDTO;
+import com.timevo_ecommerce_backend.dtos.UserLoginDTO;
 import com.timevo_ecommerce_backend.dtos.UserUpdateDTO;
 import com.timevo_ecommerce_backend.entities.User;
 import com.timevo_ecommerce_backend.exceptions.DataNotFoundException;
@@ -43,4 +44,6 @@ public interface IUserService {
      boolean forgotPassword (UserActionPasswordDTO userForgotPasswordDTO) throws DataNotFoundException;
 
      boolean changePassword (UserActionPasswordDTO userActionPasswordDTO) throws Exception;
+
+    String loginSocial (UserLoginDTO userLoginDTO) throws Exception;
 }

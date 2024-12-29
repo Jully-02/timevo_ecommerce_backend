@@ -45,6 +45,8 @@ public class WebSecurityConfig {
                                     String.format("%s/users/generate-otp", apiPrefix),
                                     String.format("%s/users/check-otp", apiPrefix),
                                     String.format("%s/users/forgot-password", apiPrefix),
+                                    String.format("%s/users/auth/social-login", apiPrefix),
+                                    String.format("%s/users/auth/social/callback", apiPrefix),
 
                                     //swagger
                                     //"/v3/api-docs",

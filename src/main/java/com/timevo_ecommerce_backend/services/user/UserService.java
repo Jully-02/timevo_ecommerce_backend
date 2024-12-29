@@ -1,8 +1,10 @@
 package com.timevo_ecommerce_backend.services.user;
 
 import com.timevo_ecommerce_backend.components.JwtTokenUtil;
+import com.timevo_ecommerce_backend.components.LocalizationUtils;
 import com.timevo_ecommerce_backend.dtos.UserDTO;
 import com.timevo_ecommerce_backend.dtos.UserActionPasswordDTO;
+import com.timevo_ecommerce_backend.dtos.UserLoginDTO;
 import com.timevo_ecommerce_backend.dtos.UserUpdateDTO;
 import com.timevo_ecommerce_backend.entities.Role;
 import com.timevo_ecommerce_backend.entities.Token;
@@ -17,6 +19,7 @@ import com.timevo_ecommerce_backend.responses.user.UserResponse;
 import com.timevo_ecommerce_backend.services.email.IEmailService;
 import com.timevo_ecommerce_backend.services.file_upload.IFileUploadService;
 import com.timevo_ecommerce_backend.utils.FileUploadUtil;
+import com.timevo_ecommerce_backend.utils.MessagesKey;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -45,6 +48,7 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final IFileUploadService fileUploadService;
+    private final LocalizationUtils localizationUtils;
 
 
     @Override
@@ -248,6 +252,75 @@ public class UserService implements IUserService {
             }
         }
         return false;
+    }
+
+    @Override
+    @Transactional
+    public String loginSocial(UserLoginDTO userLoginDTO) throws Exception {
+        Optional<User> optionalUser = Optional.empty();
+        Role roleUser = roleRepository.findById(2L)
+                .orElseThrow(() -> new DataNotFoundException(
+                        localizationUtils.getLocalizedMessage(MessagesKey.INVALID_ERROR)));
+        List<Role> roles = new ArrayList<>();
+        roles.add(roleUser);
+        if (userLoginDTO.isGoogleAccountIdValid()) {
+            optionalUser = userRepository.findByEmail(userLoginDTO.getEmail());
+
+            if (optionalUser.isEmpty()) {
+                User newUser = User.builder()
+                        .firstName(userLoginDTO.getFirstName())
+                        .email(userLoginDTO.getEmail())
+                        .lastName(userLoginDTO.getLastName())
+                        .roles(roles)
+                        .avatar(userLoginDTO.getAvatar())
+                        .googleAccountId(userLoginDTO.getGoogleAccountId())
+                        .password("")
+                        .isActive(true)
+                        .build();
+                newUser = userRepository.save(newUser);
+                optionalUser = Optional.of(newUser);
+            }
+            else {
+                if (optionalUser.get().getGoogleAccountId() == null) {
+                    optionalUser.get().setGoogleAccountId(userLoginDTO.getGoogleAccountId());
+                    optionalUser = Optional.of(userRepository.save(optionalUser.get()));
+                }
+            }
+        }
+        else if (userLoginDTO.isFacebookAccountIdValid()) {
+            optionalUser = userRepository.findByEmail(userLoginDTO.getEmail());
+            if (optionalUser.isEmpty()) {
+                User newUser = User.builder()
+                        .firstName(userLoginDTO.getFirstName())
+                        .email(userLoginDTO.getEmail())
+                        .lastName(userLoginDTO.getLastName())
+                        .roles(roles)
+                        .avatar(userLoginDTO.getAvatar())
+                        .facebookAccountId(userLoginDTO.getFacebookAccountId())
+                        .password("")
+                        .isActive(true)
+                        .build();
+
+                newUser = userRepository.save(newUser);
+                optionalUser = Optional.of(newUser);
+            }
+            else {
+                if (optionalUser.get().getFacebookAccountId() == null) {
+                    optionalUser.get().setFacebookAccountId(userLoginDTO.getFacebookAccountId());
+                    optionalUser = Optional.of(userRepository.save(optionalUser.get()));
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid social account information.");
+        }
+
+        User user = optionalUser.get();
+
+        if (!user.isActive()) {
+            throw new IllegalArgumentException(localizationUtils.getLocalizedMessage("User is locked"));
+        }
+
+        return jwtTokenUtil.generateToken(user);
     }
 
     @Override
