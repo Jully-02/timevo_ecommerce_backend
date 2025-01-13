@@ -45,6 +45,7 @@ public class FeedbackService implements IFeedbackService {
         feedbackResponse.setUserId(feedback.getUser().getId());
         feedbackResponse.setFirstName(feedback.getUser().getFirstName());
         feedbackResponse.setLastName(feedback.getUser().getLastName());
+        feedbackResponse.setAvatar(userExisting.getAvatar());
         return feedbackResponse;
     }
 
@@ -71,6 +72,7 @@ public class FeedbackService implements IFeedbackService {
         feedbackResponse.setUserId(feedbackExisting.getUser().getId());
         feedbackResponse.setFirstName(feedbackExisting.getUser().getFirstName());
         feedbackResponse.setLastName(feedbackExisting.getUser().getLastName());
+        feedbackResponse.setAvatar(userExisting.getAvatar());
         return feedbackResponse;
     }
 
@@ -84,6 +86,7 @@ public class FeedbackService implements IFeedbackService {
         feedbackResponse.setUserId(feedback.getUser().getId());
         feedbackResponse.setFirstName(feedback.getUser().getFirstName());
         feedbackResponse.setLastName(feedback.getUser().getLastName());
+        feedbackResponse.setAvatar(feedback.getUser().getAvatar());
         return feedbackResponse;
     }
 

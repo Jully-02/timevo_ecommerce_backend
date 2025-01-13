@@ -137,6 +137,7 @@ public class FeedbackController {
                     feedbackResponse.setProductId(feedback.getProduct().getId());
                     feedbackResponse.setFirstName(feedback.getUser().getFirstName());
                     feedbackResponse.setLastName(feedback.getUser().getLastName());
+                    feedbackResponse.setAvatar(feedback.getUser().getAvatar());
                     return feedbackResponse;
                 }).toList();
         return ResponseEntity.ok(
@@ -178,6 +179,7 @@ public class FeedbackController {
                             feedbackResponse.setProductId(feedback.getProduct().getId());
                             feedbackResponse.setFirstName(feedback.getUser().getFirstName());
                             feedbackResponse.setLastName(feedback.getUser().getLastName());
+                            feedbackResponse.setAvatar(feedback.getUser().getAvatar());
                             return feedbackResponse;
                         }).toList();
         return ResponseEntity.ok(
@@ -219,6 +221,7 @@ public class FeedbackController {
                     feedbackResponse.setProductId(feedback.getProduct().getId());
                     feedbackResponse.setFirstName(feedback.getUser().getFirstName());
                     feedbackResponse.setLastName(feedback.getUser().getLastName());
+                    feedbackResponse.setAvatar(feedback.getUser().getAvatar());
                     return feedbackResponse;
                 }).toList();
         return ResponseEntity.ok(

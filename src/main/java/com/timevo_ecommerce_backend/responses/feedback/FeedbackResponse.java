@@ -28,4 +28,7 @@ public class FeedbackResponse extends BaseResponse {
 
     @JsonProperty("rate")
     private float rate;
+
+    @JsonProperty("avatar")
+    private String avatar;
 }
